@@ -22,7 +22,7 @@ type Root struct {
 type ByClassName []Schema
 
 type Schema interface {
-	ClassName() string
+	Title() string
 }
 
 type Object struct {
@@ -30,8 +30,6 @@ type Object struct {
 	Type       string
 	Key        string
 	IsPrivate  bool
-	PropName   string
-	className  string
 	Properties []Schema
 }
 
@@ -40,8 +38,6 @@ type Array struct {
 	Type      string
 	Key       string
 	IsPrivate bool
-	PropName  string
-	className string
 	Items     *ItemSpec
 	Item      Schema
 }
@@ -51,8 +47,6 @@ type String struct {
 	Type        string
 	Key         string
 	IsPrivate   bool
-	PropName    string
-	className   string
 	Validations []Validation
 }
 
@@ -67,8 +61,6 @@ type Number struct {
 	Type        string
 	Key         string
 	IsPrivate   bool
-	PropName    string
-	className   string
 	Validations []Validation
 }
 
@@ -77,8 +69,6 @@ type Integer struct {
 	Type        string
 	Key         string
 	IsPrivate   bool
-	PropName    string
-	className   string
 	Validations []Validation
 }
 
@@ -87,8 +77,6 @@ type Boolean struct {
 	Type        string
 	Key         string
 	IsPrivate   bool
-	PropName    string
-	className   string
 	Validations []Validation
 }
 

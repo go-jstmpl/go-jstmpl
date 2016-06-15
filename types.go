@@ -9,7 +9,7 @@ import (
 
 func (a ByClassName) Len() int           { return len(a) }
 func (a ByClassName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByClassName) Less(i, j int) bool { return a[i].ClassName() < a[j].ClassName() }
+func (a ByClassName) Less(i, j int) bool { return a[i].Title() < a[j].Title() }
 
 func NewObject(p string, s *schema.Schema) *Object {
 	return &Object{
@@ -20,8 +20,8 @@ func NewObject(p string, s *schema.Schema) *Object {
 	}
 }
 
-func (o Object) ClassName() string {
-	return o.className
+func (o Object) Title() string {
+	return o.Schema.Title
 }
 
 func NewArray(p string, s *schema.Schema) *Array {
@@ -34,6 +34,10 @@ func NewArray(p string, s *schema.Schema) *Array {
 			Schemas:  make([]Schema, len(s.Items.Schemas)),
 		},
 	}
+}
+
+func (o Array) Title() string {
+	return o.Schema.Title
 }
 
 func NewString(p string, s *schema.Schema) *String {
@@ -53,8 +57,8 @@ func NewString(p string, s *schema.Schema) *String {
 	}
 }
 
-func (o String) ClassName() string {
-	return o.className
+func (o String) Title() string {
+	return o.Schema.Title
 }
 
 func NewNumber(p string, s *schema.Schema) *Number {
@@ -66,8 +70,8 @@ func NewNumber(p string, s *schema.Schema) *Number {
 	}
 }
 
-func (o Number) ClassName() string {
-	return o.className
+func (o Number) Title() string {
+	return o.Schema.Title
 }
 
 func NewInteger(p string, s *schema.Schema) *Integer {
@@ -79,8 +83,8 @@ func NewInteger(p string, s *schema.Schema) *Integer {
 	}
 }
 
-func (o Integer) ClassName() string {
-	return o.className
+func (o Integer) Title() string {
+	return o.Schema.Title
 }
 
 func NewBoolean(p string, s *schema.Schema) *Boolean {
@@ -92,12 +96,8 @@ func NewBoolean(p string, s *schema.Schema) *Boolean {
 	}
 }
 
-func (o Boolean) ClassName() string {
-	return o.className
-}
-
-func (o Array) ClassName() string {
-	return o.className
+func (o Boolean) Title() string {
+	return o.Schema.Title
 }
 
 func (v MinLength) String() string {

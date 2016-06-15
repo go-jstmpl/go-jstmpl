@@ -1,8 +1,10 @@
 package jstmpl
 
 import (
+	"bytes"
 	"net/url"
 	"sort"
+	"strings"
 
 	"github.com/lestrrat/go-jshschema"
 	"github.com/lestrrat/go-jsschema"
@@ -168,6 +170,34 @@ func resolve(src, ctx *schema.Schema, propName string) (Schema, error) {
 	// }
 
 	return ts, nil
+}
+
+func TitleToClassName(s string) string {
+	if s == "" {
+		return ""
+	}
+	buf := bytes.Buffer{}
+	for _, p := range rspace.Split(s, -1) {
+		buf.WriteString(strings.ToUpper(p[:1]))
+		buf.WriteString(p[1:])
+	}
+	return buf.String()
+}
+
+func KeyToPropName(s string) string {
+	if s == "" {
+		return ""
+	}
+	buf := bytes.Buffer{}
+	for i, p := range rsnake.Split(s, -1) {
+		if i == 0 {
+			buf.WriteString(p)
+			continue
+		}
+		buf.WriteString(strings.ToUpper(p[:1]))
+		buf.WriteString(p[1:])
+	}
+	return buf.String()
 }
 
 func getString(extras map[string]interface{}, key string) string {
