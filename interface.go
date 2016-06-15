@@ -7,16 +7,16 @@ import (
 	"github.com/lestrrat/go-jsschema"
 )
 
-type TSModel struct {
+type Root struct {
 	URL         *url.URL
 	Definitions map[string]*Schema
 	Links       LinkList
-	Objects     []Object
-	Arrays      []Array
-	Strings     []String
-	Numbers     []Number
-	Integers    []Integer
-	Booleans    []Boolean
+	Objects     []*Object
+	Arrays      []*Array
+	Strings     []*String
+	Numbers     []*Number
+	Integers    []*Integer
+	Booleans    []*Boolean
 }
 
 type ByClassName []Schema
@@ -105,8 +105,8 @@ type LinkList []*Link
 
 type Link struct {
 	hschema.Link
-	Schema       *Schema
-	TargetSchema *Schema
+	Schema       Schema
+	TargetSchema Schema
 }
 
 type Builder struct {

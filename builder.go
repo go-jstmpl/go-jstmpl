@@ -1,11 +1,8 @@
 package jstmpl
 
 import (
-	"bytes"
 	"net/url"
-	"regexp"
 	"sort"
-	"strings"
 
 	"github.com/lestrrat/go-jshschema"
 	"github.com/lestrrat/go-jsschema"
@@ -15,10 +12,10 @@ func NewBuilder() *Builder {
 	return &Builder{}
 }
 
-func (b *Builder) Build(hs *hschema.HyperSchema) (*TSModel, error) {
+func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 	var err error
 
-	m := &TSModel{
+	m := &Root{
 		Links: make(LinkList, len(hs.Links)),
 	}
 	str := getString(hs.Schema.Extras, "href")
@@ -34,20 +31,22 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*TSModel, error) {
 		if err != nil {
 			return nil, err
 		}
-		switch ts := s.(type) {
-		case Object:
-			os = append(os, ts)
-		case Array:
-			as = append(as, ts)
-		case String:
-			ss = append(ss, ts)
-		case Number:
-			ns = append(ns, ts)
-		case Integer:
-			is = append(is, ts)
-		case Boolean:
-			bs = append(bs, ts)
-		}
+		func(s interface{}) {
+			switch ts := s.(type) {
+			case *Object:
+				os = append(os, ts)
+			case *Array:
+				as = append(as, ts)
+			case *String:
+				ss = append(ss, ts)
+			case *Number:
+				ns = append(ns, ts)
+			case *Integer:
+				is = append(is, ts)
+			case *Boolean:
+				bs = append(bs, ts)
+			}
+		}(s)
 	}
 
 	sort.Sort(ByClassName(os))
@@ -57,56 +56,56 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*TSModel, error) {
 	sort.Sort(ByClassName(is))
 	sort.Sort(ByClassName(bs))
 
-	m.Objects = make([]Object, len(os))
+	m.Objects = make([]*Object, len(os))
 	for i, v := range os {
-		m.Objects[i] = v.(Object)
+		m.Objects[i] = v.(*Object)
 	}
-	m.Arrays = make([]Array, len(as))
+	m.Arrays = make([]*Array, len(as))
 	for i, v := range as {
-		m.Arrays[i] = v.(Array)
+		m.Arrays[i] = v.(*Array)
 	}
-	m.Strings = make([]String, len(ss))
+	m.Strings = make([]*String, len(ss))
 	for i, v := range ss {
-		m.Strings[i] = v.(String)
+		m.Strings[i] = v.(*String)
 	}
-	m.Numbers = make([]Number, len(ns))
+	m.Numbers = make([]*Number, len(ns))
 	for i, v := range ns {
-		m.Numbers[i] = v.(Number)
+		m.Numbers[i] = v.(*Number)
 	}
-	m.Integers = make([]Integer, len(is))
+	m.Integers = make([]*Integer, len(is))
 	for i, v := range is {
-		m.Integers[i] = v.(Integer)
+		m.Integers[i] = v.(*Integer)
 	}
-	m.Booleans = make([]Boolean, len(bs))
+	m.Booleans = make([]*Boolean, len(bs))
 	for i, v := range bs {
-		m.Booleans[i] = v.(Boolean)
+		m.Booleans[i] = v.(*Boolean)
 	}
 
-	// for i, l := range hs.Links {
-	// 	var (
-	// 		s, ts *Schema
-	// 	)
-	//
-	// 	if l.Schema != nil {
-	// 		s, err = resolve(l.Schema, hs.Schema)
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 	}
-	//
-	// 	if l.TargetSchema != nil {
-	// 		ts, err = resolve(l.TargetSchema, hs.Schema)
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 	}
-	//
-	// 	m.Links[i] = &Link{
-	// 		Link:         *l,
-	// 		Schema:       s,
-	// 		TargetSchema: ts,
-	// 	}
-	// }
+	for i, l := range hs.Links {
+		var (
+			s, ts Schema
+		)
+
+		if l.Schema != nil {
+			s, err = resolve(l.Schema, hs.Schema, "")
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if l.TargetSchema != nil {
+			ts, err = resolve(l.TargetSchema, hs.Schema, "")
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		m.Links[i] = &Link{
+			Link:         *l,
+			Schema:       s,
+			TargetSchema: ts,
+		}
+	}
 
 	return m, nil
 }
@@ -169,37 +168,6 @@ func resolve(src, ctx *schema.Schema, propName string) (Schema, error) {
 	// }
 
 	return ts, nil
-}
-
-var rspace = regexp.MustCompile(`\s+`)
-var rsnake = regexp.MustCompile(`_`)
-
-func TitleToClassName(s string) string {
-	if s == "" {
-		return ""
-	}
-	buf := bytes.Buffer{}
-	for _, p := range rspace.Split(s, -1) {
-		buf.WriteString(strings.ToUpper(p[:1]))
-		buf.WriteString(p[1:])
-	}
-	return buf.String()
-}
-
-func KeyToPropName(s string) string {
-	if s == "" {
-		return ""
-	}
-	buf := bytes.Buffer{}
-	for i, p := range rsnake.Split(s, -1) {
-		if i == 0 {
-			buf.WriteString(p)
-			continue
-		}
-		buf.WriteString(strings.ToUpper(p[:1]))
-		buf.WriteString(p[1:])
-	}
-	return buf.String()
 }
 
 func getString(extras map[string]interface{}, key string) string {
