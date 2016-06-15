@@ -69,7 +69,7 @@ func _main() int {
 	b := jstmpl.NewBuilder()
 	ts, err := b.Build(hs)
 	if err != nil {
-		log.Printf("fail to build TSModel: %s", err)
+		log.Printf("fail to build: %s", err)
 		return 1
 	}
 
@@ -122,7 +122,7 @@ func _main() int {
 		return nil
 	})
 	if err != nil {
-		log.Printf("fail to walk: %s", err)
+		log.Printf("fail to generate: %s", err)
 		return 1
 	}
 

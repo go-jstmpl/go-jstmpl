@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/lestrrat/go-jsschema"
 )
 
 type Generator struct{}
@@ -15,10 +17,11 @@ func NewGenerator() *Generator {
 }
 
 func (g *Generator) Process(out io.Writer, model *Root, tmpl []byte) error {
-	t := template.Must(template.New("jstmpl").Delims("/*", "*/").Funcs(map[string]interface{}{
+	t := template.Must(template.New("").Delims("/*", "*/").Funcs(map[string]interface{}{
 		"notLast":               notLast,
 		"spaceToUpperCamelCase": spaceToUpperCamelCase,
 		"snakeToLowerCamelCase": snakeToLowerCamelCase,
+		"joinTypes":             joinTypes,
 	}).Parse(string(tmpl)))
 	if err := t.Execute(out, model); err != nil {
 		return err
@@ -61,4 +64,12 @@ func snakeToLowerCamelCase(s string) string {
 		buf.WriteString(p[1:])
 	}
 	return buf.String()
+}
+
+func joinTypes(ts schema.PrimitiveTypes, sep string) string {
+	var strs []string
+	for _, t := range ts {
+		strs = append(strs, t.String())
+	}
+	return strings.Join(strs, sep)
 }

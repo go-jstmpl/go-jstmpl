@@ -8,6 +8,7 @@ import (
 )
 
 type Root struct {
+	*hschema.HyperSchema
 	URL         *url.URL
 	Definitions map[string]*Schema
 	Links       LinkList
@@ -23,12 +24,14 @@ type ByClassName []Schema
 
 type Schema interface {
 	Title() string
+	Key() string
+	Example() string
 }
 
 type Object struct {
 	*schema.Schema
 	Type       string
-	Key        string
+	key        string
 	IsPrivate  bool
 	Properties []Schema
 }
@@ -36,7 +39,7 @@ type Object struct {
 type Array struct {
 	*schema.Schema
 	Type      string
-	Key       string
+	key       string
 	IsPrivate bool
 	Items     *ItemSpec
 	Item      Schema
@@ -45,7 +48,31 @@ type Array struct {
 type String struct {
 	*schema.Schema
 	Type        string
-	Key         string
+	key         string
+	IsPrivate   bool
+	Validations []Validation
+}
+
+type Number struct {
+	*schema.Schema
+	Type        string
+	key         string
+	IsPrivate   bool
+	Validations []Validation
+}
+
+type Integer struct {
+	*schema.Schema
+	Type        string
+	key         string
+	IsPrivate   bool
+	Validations []Validation
+}
+
+type Boolean struct {
+	*schema.Schema
+	Type        string
+	key         string
 	IsPrivate   bool
 	Validations []Validation
 }
@@ -54,30 +81,6 @@ type Validation interface {
 	String() string
 	Func() string
 	Args() string
-}
-
-type Number struct {
-	*schema.Schema
-	Type        string
-	Key         string
-	IsPrivate   bool
-	Validations []Validation
-}
-
-type Integer struct {
-	*schema.Schema
-	Type        string
-	Key         string
-	IsPrivate   bool
-	Validations []Validation
-}
-
-type Boolean struct {
-	*schema.Schema
-	Type        string
-	Key         string
-	IsPrivate   bool
-	Validations []Validation
 }
 
 type MinLength int

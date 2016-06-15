@@ -2,6 +2,7 @@ package jstmpl
 
 import (
 	"bytes"
+	"fmt"
 	"net/url"
 	"sort"
 	"strings"
@@ -18,7 +19,8 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 	var err error
 
 	m := &Root{
-		Links: make(LinkList, len(hs.Links)),
+		HyperSchema: hs,
+		Links:       make(LinkList, len(hs.Links)),
 	}
 	str := getString(hs.Schema.Extras, "href")
 	m.URL, err = url.Parse(str)
@@ -153,6 +155,7 @@ func resolve(src, ctx *schema.Schema, propName string) (Schema, error) {
 	} else if rs.Type.Contains(schema.BooleanType) {
 		ts = NewBoolean(propName, rs)
 	} else {
+		return nil, fmt.Errorf("undefined type: %+v", rs)
 	}
 
 	// if rs.Items != nil {
