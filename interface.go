@@ -7,11 +7,19 @@ import (
 	"github.com/lestrrat/go-jsschema"
 )
 
+type Schema interface {
+	Raw() *schema.Schema
+	Title() string
+	Key() string
+	Example() interface{}
+}
+
 type Root struct {
 	*hschema.HyperSchema
 	URL         *url.URL
-	Definitions map[string]*Schema
 	Links       LinkList
+	Definitions []Schema
+	Properties  []Schema
 	Objects     []*Object
 	Arrays      []*Array
 	Strings     []*String
@@ -20,13 +28,8 @@ type Root struct {
 	Booleans    []*Boolean
 }
 
-type ByClassName []Schema
-
-type Schema interface {
-	Title() string
-	Key() string
-	Example() string
-}
+type ByTitle []Schema
+type ByKey []Header
 
 type Object struct {
 	*schema.Schema
@@ -84,7 +87,6 @@ type Validation interface {
 }
 
 type MinLength int
-
 type MaxLength int
 
 type ItemSpec struct {
@@ -96,8 +98,13 @@ type LinkList []*Link
 
 type Link struct {
 	hschema.Link
+	URL          *url.URL
 	Schema       Schema
 	TargetSchema Schema
+}
+
+type Header struct {
+	Key, Value string
 }
 
 type Builder struct {

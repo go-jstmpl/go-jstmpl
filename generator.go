@@ -2,6 +2,8 @@ package jstmpl
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"io"
 	"regexp"
 	"strings"
@@ -22,6 +24,7 @@ func (g *Generator) Process(out io.Writer, model *Root, tmpl []byte) error {
 		"spaceToUpperCamelCase": spaceToUpperCamelCase,
 		"snakeToLowerCamelCase": snakeToLowerCamelCase,
 		"joinTypes":             joinTypes,
+		"serialize":             serialize,
 	}).Parse(string(tmpl)))
 	if err := t.Execute(out, model); err != nil {
 		return err
@@ -72,4 +75,12 @@ func joinTypes(ts schema.PrimitiveTypes, sep string) string {
 		strs = append(strs, t.String())
 	}
 	return strings.Join(strs, sep)
+}
+
+func serialize(v interface{}) string {
+	j, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return fmt.Sprint(v)
+	}
+	return string(j)
 }
