@@ -25,7 +25,7 @@ func (g *Generator) Process(out io.Writer, model *Root, tmpl []byte) error {
 		"snakeToLowerCamelCase": snakeToLowerCamelCase,
 		"joinTypes":             joinTypes,
 		"serialize":             serialize,
-		"convertTypeToGo":       convertTypeToGo,
+		"convertTypeForGo":      convertTypeForGo,
 	}).Parse(string(tmpl)))
 	if err := t.Execute(out, model); err != nil {
 		return err
@@ -86,7 +86,7 @@ func serialize(v interface{}) string {
 	return string(j)
 }
 
-func convertTypeToGo(ts schema.PrimitiveTypes) string {
+func convertTypeForGo(ts schema.PrimitiveTypes) string {
 	if ts.Len() >= 2 {
 		return ""
 	}
