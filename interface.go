@@ -33,19 +33,21 @@ type ByKey []Header
 
 type Object struct {
 	*schema.Schema
-	Type       string
-	key        string
-	IsPrivate  bool
-	Properties []Schema
+	Type        string
+	key         string
+	IsPrivate   bool
+	Validations []Validation
+	Properties  []Schema
 }
 
 type Array struct {
 	*schema.Schema
-	Type      string
-	key       string
-	IsPrivate bool
-	Items     *ItemSpec
-	Item      Schema
+	Type        string
+	key         string
+	IsPrivate   bool
+	Validations []Validation
+	Items       *ItemSpec
+	Item        Schema
 }
 
 type String struct {
@@ -79,15 +81,6 @@ type Boolean struct {
 	IsPrivate   bool
 	Validations []Validation
 }
-
-type Validation interface {
-	String() string
-	Func() string
-	Args() string
-}
-
-type MinLength int
-type MaxLength int
 
 type ItemSpec struct {
 	*schema.ItemSpec
