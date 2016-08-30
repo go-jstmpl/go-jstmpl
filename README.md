@@ -5,7 +5,7 @@ Template renderer using JSON Schema as data
 ## Installation
 
 ```
-go get -u github.com/minodisk/go-jstmpl/cmd/jstmpl
+go get -u github.com/go-jstmpl/go-jstmpl/cmd/jstmpl
 ```
 
 ## Usage
