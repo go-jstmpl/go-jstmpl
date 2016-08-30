@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
+	"github.com/go-jstmpl/go-jstmpl"
 	"github.com/jessevdk/go-flags"
 	"github.com/lestrrat/go-jshschema"
-	"github.com/minodisk/go-jstmpl"
 )
 
 func main() {
