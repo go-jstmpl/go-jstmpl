@@ -20,8 +20,11 @@ func NewGenerator() *Generator {
 
 func (g *Generator) Process(out io.Writer, model *Root, tmpl []byte) error {
 	t := template.Must(template.New("").Delims("/*", "*/").Funcs(map[string]interface{}{
+		"toUpperFirst":          toUpperFirst,
+		"toLowerFirst":          toLowerFirst,
 		"notLast":               notLast,
 		"spaceToUpperCamelCase": spaceToUpperCamelCase,
+		"snakeToUpperCamelCase": snakeToUpperCamelCase,
 		"snakeToLowerCamelCase": snakeToLowerCamelCase,
 		"joinTypes":             joinTypes,
 		"serialize":             serialize,
@@ -54,6 +57,18 @@ func spaceToUpperCamelCase(s string) string {
 	return buf.String()
 }
 
+func snakeToUpperCamelCase(s string) string {
+	if s == "" {
+		return ""
+	}
+	buf := bytes.Buffer{}
+	for _, p := range rsnake.Split(s, -1) {
+		buf.WriteString(strings.ToUpper(p[:1]))
+		buf.WriteString(p[1:])
+	}
+	return buf.String()
+}
+
 func snakeToLowerCamelCase(s string) string {
 	if s == "" {
 		return ""
@@ -70,6 +85,20 @@ func snakeToLowerCamelCase(s string) string {
 	return buf.String()
 }
 
+func toUpperFirst(s string) string {
+	buf := bytes.Buffer{}
+	buf.WriteString(strings.ToUpper(s[:1]))
+	buf.WriteString(s[1:])
+	return buf.String()
+}
+
+func toLowerFirst(s string) string {
+	buf := bytes.Buffer{}
+	buf.WriteString(strings.ToLower(s[:1]))
+	buf.WriteString(s[1:])
+	return buf.String()
+}
+
 func joinTypes(ts schema.PrimitiveTypes, sep string) string {
 	var strs []string
 	for _, t := range ts {
@@ -79,7 +108,7 @@ func joinTypes(ts schema.PrimitiveTypes, sep string) string {
 }
 
 func serialize(v interface{}) string {
-	j, err := json.MarshalIndent(v, "", "  ")
+	j, err := json.Marshal(v)
 	if err != nil {
 		return fmt.Sprint(v)
 	}
