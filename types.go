@@ -2,8 +2,6 @@ package jstmpl
 
 import (
 	"encoding/json"
-	"fmt"
-	"reflect"
 	"sort"
 
 	"github.com/lestrrat/go-jsschema"
@@ -81,19 +79,25 @@ func (o Array) Example() interface{} {
 }
 
 func NewString(p string, s *schema.Schema) *String {
-	v := []Validation{}
-	if s.MinLength.Initialized {
-		v = append(v, MinLength(s.MinLength.Val))
+	vs := []Validation{}
+	if v, err := NewFormat(s); err == nil {
+		vs = append(vs, v)
 	}
-	if s.MaxLength.Initialized {
-		v = append(v, MinLength(s.MaxLength.Val))
+	if v, err := NewMinLength(s); err == nil {
+		vs = append(vs, v)
+	}
+	if v, err := NewMaxLength(s); err == nil {
+		vs = append(vs, v)
+	}
+	if v, err := NewPattern(s); err == nil {
+		vs = append(vs, v)
 	}
 	return &String{
 		Schema:      s,
 		Type:        "string",
 		key:         p,
 		IsPrivate:   true,
-		Validations: v,
+		Validations: vs,
 	}
 }
 
@@ -118,11 +122,19 @@ func (o String) Example() interface{} {
 }
 
 func NewNumber(p string, s *schema.Schema) *Number {
+	vs := []Validation{}
+	if v, err := NewMaximumValidation(s); err == nil {
+		vs = append(vs, v)
+	}
+	if v, err := NewMinimumValidation(s); err == nil {
+		vs = append(vs, v)
+	}
 	return &Number{
-		Schema:    s,
-		Type:      "number",
-		key:       p,
-		IsPrivate: true,
+		Schema:      s,
+		Type:        "number",
+		key:         p,
+		IsPrivate:   true,
+		Validations: vs,
 	}
 }
 
@@ -147,11 +159,19 @@ func (o Number) Example() interface{} {
 }
 
 func NewInteger(p string, s *schema.Schema) *Integer {
+	vs := []Validation{}
+	if v, err := NewMaximumValidation(s); err == nil {
+		vs = append(vs, v)
+	}
+	if v, err := NewMinimumValidation(s); err == nil {
+		vs = append(vs, v)
+	}
 	return &Integer{
-		Schema:    s,
-		Type:      "number",
-		key:       p,
-		IsPrivate: true,
+		Schema:      s,
+		Type:        "number",
+		key:         p,
+		IsPrivate:   true,
+		Validations: vs,
 	}
 }
 
@@ -176,11 +196,13 @@ func (o Integer) Example() interface{} {
 }
 
 func NewBoolean(p string, s *schema.Schema) *Boolean {
+	vs := []Validation{}
 	return &Boolean{
-		Schema:    s,
-		Type:      "boolean",
-		key:       p,
-		IsPrivate: true,
+		Schema:      s,
+		Type:        "boolean",
+		key:         p,
+		IsPrivate:   true,
+		Validations: vs,
 	}
 }
 
@@ -202,30 +224,6 @@ func (o Boolean) Example() interface{} {
 		return e
 	}
 	return false
-}
-
-func (v MinLength) String() string {
-	return fmt.Sprintf("%s(%d)", reflect.TypeOf(v).Name(), v)
-}
-
-func (v MinLength) Func() string {
-	return reflect.TypeOf(v).Name()
-}
-
-func (v MinLength) Args() string {
-	return fmt.Sprintf("%d", v)
-}
-
-func (v MaxLength) String() string {
-	return fmt.Sprintf("%s(%d)", reflect.TypeOf(v).Name(), v)
-}
-
-func (v MaxLength) Func() string {
-	return reflect.TypeOf(v).Name()
-}
-
-func (v MaxLength) Args() string {
-	return fmt.Sprintf("%d", v)
 }
 
 func (l Link) ReqHeaders() []Header {
