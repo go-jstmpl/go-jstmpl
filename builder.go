@@ -1,38 +1,41 @@
 package jstmpl
 
 import (
-	"bytes"
 	"fmt"
 	"net/url"
 	"sort"
-	"strings"
 
+	"github.com/go-jstmpl/go-jstmpl/types"
 	"github.com/lestrrat/go-jshschema"
 	"github.com/lestrrat/go-jsschema"
 )
+
+type Builder struct {
+	Schema *schema.Schema
+}
 
 func NewBuilder() *Builder {
 	return &Builder{}
 }
 
-func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
+func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 	var err error
 
-	m := &Root{
+	m := &types.Root{
 		HyperSchema: hs,
-		Links:       make(LinkList, len(hs.Links)),
+		Links:       make(types.LinkList, len(hs.Links)),
 	}
-	str := getString(hs.Schema.Extras, "href")
+	str := hs.Schema.Extras["href"].(string)
 	m.URL, err = url.Parse(str)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx := &Context{
-		validations: map[string]bool{},
+	ctx := &types.Context{
+		Validations: map[string]bool{},
 	}
 
-	var ds, os, as, ss, ns, is, bs, ps []Schema
+	var ds, os, as, ss, ns, is, bs, ps []types.Schema
 
 	for k, s := range hs.Definitions {
 		ctx.Key = k
@@ -43,17 +46,17 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 		ds = append(ds, rs)
 		func(s interface{}) {
 			switch ts := s.(type) {
-			case *Object:
+			case *types.Object:
 				os = append(os, ts)
-			case *Array:
+			case *types.Array:
 				as = append(as, ts)
-			case *String:
+			case *types.String:
 				ss = append(ss, ts)
-			case *Number:
+			case *types.Number:
 				ns = append(ns, ts)
-			case *Integer:
+			case *types.Integer:
 				is = append(is, ts)
-			case *Boolean:
+			case *types.Boolean:
 				bs = append(bs, ts)
 			}
 		}(rs)
@@ -68,45 +71,45 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 		ps = append(ps, rs)
 	}
 
-	sort.Sort(SchemasByKey(ds))
-	sort.Sort(SchemasByKey(os))
-	sort.Sort(SchemasByKey(as))
-	sort.Sort(SchemasByKey(ss))
-	sort.Sort(SchemasByKey(ns))
-	sort.Sort(SchemasByKey(is))
-	sort.Sort(SchemasByKey(bs))
-	sort.Sort(SchemasByKey(ps))
+	sort.Sort(types.SchemasByKey(ds))
+	sort.Sort(types.SchemasByKey(os))
+	sort.Sort(types.SchemasByKey(as))
+	sort.Sort(types.SchemasByKey(ss))
+	sort.Sort(types.SchemasByKey(ns))
+	sort.Sort(types.SchemasByKey(is))
+	sort.Sort(types.SchemasByKey(bs))
+	sort.Sort(types.SchemasByKey(ps))
 
 	m.Definitions = ds
-	m.Objects = make([]*Object, len(os))
+	m.Objects = make([]*types.Object, len(os))
 	for i, v := range os {
-		m.Objects[i] = v.(*Object)
+		m.Objects[i] = v.(*types.Object)
 	}
-	m.Arrays = make([]*Array, len(as))
+	m.Arrays = make([]*types.Array, len(as))
 	for i, v := range as {
-		m.Arrays[i] = v.(*Array)
+		m.Arrays[i] = v.(*types.Array)
 	}
-	m.Strings = make([]*String, len(ss))
+	m.Strings = make([]*types.String, len(ss))
 	for i, v := range ss {
-		m.Strings[i] = v.(*String)
+		m.Strings[i] = v.(*types.String)
 	}
-	m.Numbers = make([]*Number, len(ns))
+	m.Numbers = make([]*types.Number, len(ns))
 	for i, v := range ns {
-		m.Numbers[i] = v.(*Number)
+		m.Numbers[i] = v.(*types.Number)
 	}
-	m.Integers = make([]*Integer, len(is))
+	m.Integers = make([]*types.Integer, len(is))
 	for i, v := range is {
-		m.Integers[i] = v.(*Integer)
+		m.Integers[i] = v.(*types.Integer)
 	}
-	m.Booleans = make([]*Boolean, len(bs))
+	m.Booleans = make([]*types.Boolean, len(bs))
 	for i, v := range bs {
-		m.Booleans[i] = v.(*Boolean)
+		m.Booleans[i] = v.(*types.Boolean)
 	}
 	m.Properties = ps
 
 	for i, l := range hs.Links {
 		var (
-			s, ts Schema
+			s, ts types.Schema
 		)
 
 		if l.Schema != nil {
@@ -129,7 +132,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 		if err != nil {
 			return nil, err
 		}
-		m.Links[i] = &Link{
+		m.Links[i] = &types.Link{
 			Link:         *l,
 			URL:          u,
 			Schema:       s,
@@ -142,36 +145,15 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 	return m, nil
 }
 
-type Context struct {
-	Key         string
-	validations map[string]bool
-}
-
-func (ctx *Context) AddValidation(v Validation) {
-	ctx.validations[v.Func()] = true
-}
-
-func (ctx *Context) RequiredValidations() []string {
-	vs := []string{}
-	for v, b := range ctx.validations {
-		if !b {
-			continue
-		}
-		vs = append(vs, v)
-	}
-	sort.Strings(vs)
-	return vs
-}
-
-func resolve(s, t *schema.Schema, ctx *Context) (Schema, error) {
+func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
 	rs, err := s.Resolve(t)
 	if err != nil {
 		return nil, err
 	}
 
-	var ts Schema
+	var ts types.Schema
 	if rs.Type.Contains(schema.ObjectType) {
-		obj := NewObject(ctx, rs)
+		obj := types.NewObject(ctx, rs)
 		for key, sp := range rs.Properties {
 			if sp != nil {
 				ctx.Key = key
@@ -180,13 +162,13 @@ func resolve(s, t *schema.Schema, ctx *Context) (Schema, error) {
 					return nil, err
 				}
 				ps := append(obj.Properties, dp)
-				sort.Sort(SchemasByKey(ps))
+				sort.Sort(types.SchemasByKey(ps))
 				obj.Properties = ps
 			}
 		}
 		ts = obj
 	} else if rs.Type.Contains(schema.ArrayType) {
-		arr := NewArray(ctx, rs)
+		arr := types.NewArray(ctx, rs)
 		for i, sp := range rs.Items.Schemas {
 			ctx.Key = ""
 			dp, err := resolve(sp, t, ctx)
@@ -200,63 +182,16 @@ func resolve(s, t *schema.Schema, ctx *Context) (Schema, error) {
 		}
 		ts = arr
 	} else if rs.Type.Contains(schema.StringType) {
-		ts = NewString(ctx, rs)
+		ts = types.NewString(ctx, rs)
 	} else if rs.Type.Contains(schema.NumberType) {
-		ts = NewNumber(ctx, rs)
+		ts = types.NewNumber(ctx, rs)
 	} else if rs.Type.Contains(schema.IntegerType) {
-		ts = NewInteger(ctx, rs)
+		ts = types.NewInteger(ctx, rs)
 	} else if rs.Type.Contains(schema.BooleanType) {
-		ts = NewBoolean(ctx, rs)
+		ts = types.NewBoolean(ctx, rs)
 	} else {
 		return nil, fmt.Errorf("undefined type: %+v", rs)
 	}
 
-	// if rs.Items != nil {
-	// 	dest.Items = &ItemSpec{
-	// 		ItemSpec: rs.Items,
-	// 		Schemas:  make([]*Schema, len(rs.Items.Schemas)),
-	// 	}
-	// 	for i, sp := range rs.Items.Schemas {
-	// 		dp, err := resolve(sp, ctx)
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 		dest.Items.Schemas[i] = dp
-	// 	}
-	// }
-
 	return ts, nil
-}
-
-func TitleToClassName(s string) string {
-	if s == "" {
-		return ""
-	}
-	buf := bytes.Buffer{}
-	for _, p := range rspace.Split(s, -1) {
-		buf.WriteString(strings.ToUpper(p[:1]))
-		buf.WriteString(p[1:])
-	}
-	return buf.String()
-}
-
-func KeyToPropName(s string) string {
-	if s == "" {
-		return ""
-	}
-	buf := bytes.Buffer{}
-	for i, p := range rsnake.Split(s, -1) {
-		if i == 0 {
-			buf.WriteString(p)
-			continue
-		}
-		buf.WriteString(strings.ToUpper(p[:1]))
-		buf.WriteString(p[1:])
-	}
-	return buf.String()
-}
-
-func getString(extras map[string]interface{}, key string) string {
-	v, _ := extras[key].(string)
-	return v
 }
