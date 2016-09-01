@@ -28,10 +28,15 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 		return nil, err
 	}
 
+	ctx := &Context{
+		validations: map[string]bool{},
+	}
+
 	var ds, os, as, ss, ns, is, bs, ps []Schema
 
-	for _, s := range hs.Definitions {
-		rs, err := resolve(s, hs.Schema, "")
+	for k, s := range hs.Definitions {
+		ctx.Key = k
+		rs, err := resolve(s, hs.Schema, ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -54,22 +59,23 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 		}(rs)
 	}
 
-	for _, s := range hs.Properties {
-		rs, err := resolve(s, hs.Schema, "")
+	for k, s := range hs.Properties {
+		ctx.Key = k
+		rs, err := resolve(s, hs.Schema, ctx)
 		if err != nil {
 			return nil, err
 		}
 		ps = append(ps, rs)
 	}
 
-	sort.Sort(ByTitle(ds))
-	sort.Sort(ByTitle(os))
-	sort.Sort(ByTitle(as))
-	sort.Sort(ByTitle(ss))
-	sort.Sort(ByTitle(ns))
-	sort.Sort(ByTitle(is))
-	sort.Sort(ByTitle(bs))
-	sort.Sort(ByTitle(ps))
+	sort.Sort(SchemasByKey(ds))
+	sort.Sort(SchemasByKey(os))
+	sort.Sort(SchemasByKey(as))
+	sort.Sort(SchemasByKey(ss))
+	sort.Sort(SchemasByKey(ns))
+	sort.Sort(SchemasByKey(is))
+	sort.Sort(SchemasByKey(bs))
+	sort.Sort(SchemasByKey(ps))
 
 	m.Definitions = ds
 	m.Objects = make([]*Object, len(os))
@@ -104,14 +110,16 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 		)
 
 		if l.Schema != nil {
-			s, err = resolve(l.Schema, hs.Schema, "")
+			ctx.Key = ""
+			s, err = resolve(l.Schema, hs.Schema, ctx)
 			if err != nil {
 				return nil, err
 			}
 		}
 
 		if l.TargetSchema != nil {
-			ts, err = resolve(l.TargetSchema, hs.Schema, "")
+			ctx.Key = ""
+			ts, err = resolve(l.TargetSchema, hs.Schema, ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -129,32 +137,59 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 		}
 	}
 
+	m.RequiredValidations = ctx.RequiredValidations()
+
 	return m, nil
 }
 
-func resolve(src, ctx *schema.Schema, propName string) (Schema, error) {
-	rs, err := src.Resolve(ctx)
+type Context struct {
+	Key         string
+	validations map[string]bool
+}
+
+func (ctx *Context) AddValidation(v Validation) {
+	ctx.validations[v.Func()] = true
+}
+
+func (ctx *Context) RequiredValidations() []string {
+	vs := []string{}
+	for v, b := range ctx.validations {
+		if !b {
+			continue
+		}
+		vs = append(vs, v)
+	}
+	sort.Strings(vs)
+	return vs
+}
+
+func resolve(s, t *schema.Schema, ctx *Context) (Schema, error) {
+	rs, err := s.Resolve(t)
 	if err != nil {
 		return nil, err
 	}
 
 	var ts Schema
 	if rs.Type.Contains(schema.ObjectType) {
-		obj := NewObject(propName, rs)
+		obj := NewObject(ctx, rs)
 		for key, sp := range rs.Properties {
 			if sp != nil {
-				dp, err := resolve(sp, ctx, key)
+				ctx.Key = key
+				dp, err := resolve(sp, t, ctx)
 				if err != nil {
 					return nil, err
 				}
-				obj.Properties = append(obj.Properties, dp)
+				ps := append(obj.Properties, dp)
+				sort.Sort(SchemasByKey(ps))
+				obj.Properties = ps
 			}
 		}
 		ts = obj
 	} else if rs.Type.Contains(schema.ArrayType) {
-		arr := NewArray(propName, rs)
+		arr := NewArray(ctx, rs)
 		for i, sp := range rs.Items.Schemas {
-			dp, err := resolve(sp, ctx, "")
+			ctx.Key = ""
+			dp, err := resolve(sp, t, ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -165,13 +200,13 @@ func resolve(src, ctx *schema.Schema, propName string) (Schema, error) {
 		}
 		ts = arr
 	} else if rs.Type.Contains(schema.StringType) {
-		ts = NewString(propName, rs)
+		ts = NewString(ctx, rs)
 	} else if rs.Type.Contains(schema.NumberType) {
-		ts = NewNumber(propName, rs)
+		ts = NewNumber(ctx, rs)
 	} else if rs.Type.Contains(schema.IntegerType) {
-		ts = NewInteger(propName, rs)
+		ts = NewInteger(ctx, rs)
 	} else if rs.Type.Contains(schema.BooleanType) {
-		ts = NewBoolean(propName, rs)
+		ts = NewBoolean(ctx, rs)
 	} else {
 		return nil, fmt.Errorf("undefined type: %+v", rs)
 	}

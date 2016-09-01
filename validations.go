@@ -13,23 +13,23 @@ type Validation interface {
 
 type Enum []interface{}
 
-type Format struct {
+type FormatValidation struct {
 	Format string
 }
 
-func NewFormat(s *schema.Schema) (Format, error) {
+func NewFormatValidation(s *schema.Schema) (FormatValidation, error) {
 	f := string(s.Format)
 	if f == "" {
-		return Format{}, fmt.Errorf("not initialized")
+		return FormatValidation{}, fmt.Errorf("not initialized")
 	}
-	return Format{f}, nil
+	return FormatValidation{f}, nil
 }
 
-func (v Format) Func() string {
+func (v FormatValidation) Func() string {
 	return "Format"
 }
 
-func (v Format) Args() map[string]interface{} {
+func (v FormatValidation) Args() map[string]interface{} {
 	return map[string]interface{}{
 		"Format": v.Format,
 	}
@@ -87,64 +87,64 @@ func (v MinimumValidation) Args() map[string]interface{} {
 	}
 }
 
-type MaxLength struct {
+type MaxLengthValidation struct {
 	MaxLength int
 }
 
-func NewMaxLength(s *schema.Schema) (MaxLength, error) {
+func NewMaxLengthValidation(s *schema.Schema) (MaxLengthValidation, error) {
 	if !s.MaxLength.Initialized {
-		return MaxLength{}, fmt.Errorf("not initialized")
+		return MaxLengthValidation{}, fmt.Errorf("not initialized")
 	}
-	return MaxLength{s.MaxLength.Val}, nil
+	return MaxLengthValidation{s.MaxLength.Val}, nil
 }
 
-func (v MaxLength) Func() string {
+func (v MaxLengthValidation) Func() string {
 	return "MaxLength"
 }
 
-func (v MaxLength) Args() map[string]interface{} {
+func (v MaxLengthValidation) Args() map[string]interface{} {
 	return map[string]interface{}{
 		"MaxLength": v.MaxLength,
 	}
 }
 
-type MinLength struct {
+type MinLengthValidation struct {
 	MinLength int
 }
 
-func NewMinLength(s *schema.Schema) (MinLength, error) {
+func NewMinLengthValidation(s *schema.Schema) (MinLengthValidation, error) {
 	if !s.MinLength.Initialized {
-		return MinLength{}, fmt.Errorf("not initialized")
+		return MinLengthValidation{}, fmt.Errorf("not initialized")
 	}
-	return MinLength{s.MinLength.Val}, nil
+	return MinLengthValidation{s.MinLength.Val}, nil
 }
 
-func (v MinLength) Func() string {
+func (v MinLengthValidation) Func() string {
 	return "MinLength"
 }
 
-func (v MinLength) Args() map[string]interface{} {
+func (v MinLengthValidation) Args() map[string]interface{} {
 	return map[string]interface{}{
 		"MinLength": v.MinLength,
 	}
 }
 
-type Pattern struct {
+type PatternValidation struct {
 	Pattern string
 }
 
-func NewPattern(s *schema.Schema) (Pattern, error) {
+func NewPatternValidation(s *schema.Schema) (PatternValidation, error) {
 	if s.Pattern == nil {
-		return Pattern{}, fmt.Errorf("not initialized")
+		return PatternValidation{}, fmt.Errorf("not initialized")
 	}
-	return Pattern{s.Pattern.String()}, nil
+	return PatternValidation{s.Pattern.String()}, nil
 }
 
-func (v Pattern) Func() string {
+func (v PatternValidation) Func() string {
 	return "Pattern"
 }
 
-func (v Pattern) Args() map[string]interface{} {
+func (v PatternValidation) Args() map[string]interface{} {
 	return map[string]interface{}{
 		"Pattern": v.Pattern,
 	}

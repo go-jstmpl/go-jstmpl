@@ -7,19 +7,31 @@ import (
 	"github.com/lestrrat/go-jsschema"
 )
 
+type SchemasByKey []Schema
+
+func (a SchemasByKey) Len() int           { return len(a) }
+func (a SchemasByKey) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a SchemasByKey) Less(i, j int) bool { return a[i].Key() < a[j].Key() }
+
+type ByTitle []Schema
+
 func (a ByTitle) Len() int           { return len(a) }
 func (a ByTitle) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByTitle) Less(i, j int) bool { return a[i].Title() < a[j].Title() }
+
+type ByKey []Header
 
 func (a ByKey) Len() int           { return len(a) }
 func (a ByKey) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByKey) Less(i, j int) bool { return a[i].Key < a[j].Key }
 
-func NewObject(p string, s *schema.Schema) *Object {
+func NewObject(ctx *Context, s *schema.Schema) *Object {
 	return &Object{
 		Schema:     s,
-		Type:       "object",
-		key:        p,
+		NativeType: "object",
+		Type:       spaceToUpperCamelCase(s.Title),
+		Name:       spaceToUpperCamelCase(s.Title),
+		key:        ctx.Key,
 		IsPrivate:  false,
 		Properties: []Schema{},
 	}
@@ -31,6 +43,10 @@ func (o Object) Raw() *schema.Schema {
 
 func (o Object) Title() string {
 	return o.Schema.Title
+}
+
+func (o Object) Format() string {
+	return string(o.Schema.Format)
 }
 
 func (o Object) Key() string {
@@ -45,12 +61,14 @@ func (o Object) Example() interface{} {
 	return e
 }
 
-func NewArray(p string, s *schema.Schema) *Array {
+func NewArray(ctx *Context, s *schema.Schema) *Array {
 	return &Array{
-		Schema:    s,
-		Type:      "array",
-		key:       p,
-		IsPrivate: false,
+		Schema:     s,
+		NativeType: "array",
+		Type:       spaceToUpperCamelCase(s.Title),
+		Name:       spaceToUpperCamelCase(s.Title),
+		key:        ctx.Key,
+		IsPrivate:  false,
 		Items: &ItemSpec{
 			ItemSpec: s.Items,
 			Schemas:  make([]Schema, len(s.Items.Schemas)),
@@ -66,6 +84,10 @@ func (o Array) Title() string {
 	return o.Schema.Title
 }
 
+func (o Array) Format() string {
+	return string(o.Schema.Format)
+}
+
 func (o Array) Key() string {
 	return o.key
 }
@@ -78,24 +100,30 @@ func (o Array) Example() interface{} {
 	return e
 }
 
-func NewString(p string, s *schema.Schema) *String {
+func NewString(ctx *Context, s *schema.Schema) *String {
 	vs := []Validation{}
-	if v, err := NewFormat(s); err == nil {
+	if v, err := NewFormatValidation(s); err == nil {
+		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
-	if v, err := NewMinLength(s); err == nil {
+	if v, err := NewMinLengthValidation(s); err == nil {
+		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
-	if v, err := NewMaxLength(s); err == nil {
+	if v, err := NewMaxLengthValidation(s); err == nil {
+		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
-	if v, err := NewPattern(s); err == nil {
+	if v, err := NewPatternValidation(s); err == nil {
+		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
 	return &String{
 		Schema:      s,
+		NativeType:  "string",
 		Type:        "string",
-		key:         p,
+		Name:        spaceToUpperCamelCase(s.Title),
+		key:         ctx.Key,
 		IsPrivate:   true,
 		Validations: vs,
 	}
@@ -107,6 +135,10 @@ func (o String) Raw() *schema.Schema {
 
 func (o String) Title() string {
 	return o.Schema.Title
+}
+
+func (o String) Format() string {
+	return string(o.Schema.Format)
 }
 
 func (o String) Key() string {
@@ -121,18 +153,22 @@ func (o String) Example() interface{} {
 	return ""
 }
 
-func NewNumber(p string, s *schema.Schema) *Number {
+func NewNumber(ctx *Context, s *schema.Schema) *Number {
 	vs := []Validation{}
 	if v, err := NewMaximumValidation(s); err == nil {
+		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
 	if v, err := NewMinimumValidation(s); err == nil {
+		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
 	return &Number{
 		Schema:      s,
+		NativeType:  "number",
 		Type:        "number",
-		key:         p,
+		Name:        spaceToUpperCamelCase(s.Title),
+		key:         ctx.Key,
 		IsPrivate:   true,
 		Validations: vs,
 	}
@@ -144,6 +180,10 @@ func (o Number) Raw() *schema.Schema {
 
 func (o Number) Title() string {
 	return o.Schema.Title
+}
+
+func (o Number) Format() string {
+	return string(o.Schema.Format)
 }
 
 func (o Number) Key() string {
@@ -158,18 +198,22 @@ func (o Number) Example() interface{} {
 	return 0
 }
 
-func NewInteger(p string, s *schema.Schema) *Integer {
+func NewInteger(ctx *Context, s *schema.Schema) *Integer {
 	vs := []Validation{}
 	if v, err := NewMaximumValidation(s); err == nil {
+		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
 	if v, err := NewMinimumValidation(s); err == nil {
+		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
 	return &Integer{
 		Schema:      s,
+		NativeType:  "number",
 		Type:        "number",
-		key:         p,
+		Name:        spaceToUpperCamelCase(s.Title),
+		key:         ctx.Key,
 		IsPrivate:   true,
 		Validations: vs,
 	}
@@ -181,6 +225,10 @@ func (o Integer) Raw() *schema.Schema {
 
 func (o Integer) Title() string {
 	return o.Schema.Title
+}
+
+func (o Integer) Format() string {
+	return string(o.Schema.Format)
 }
 
 func (o Integer) Key() string {
@@ -195,12 +243,14 @@ func (o Integer) Example() interface{} {
 	return 0
 }
 
-func NewBoolean(p string, s *schema.Schema) *Boolean {
+func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 	vs := []Validation{}
 	return &Boolean{
 		Schema:      s,
+		NativeType:  "boolean",
 		Type:        "boolean",
-		key:         p,
+		Name:        spaceToUpperCamelCase(s.Title),
+		key:         ctx.Key,
 		IsPrivate:   true,
 		Validations: vs,
 	}
@@ -212,6 +262,10 @@ func (o Boolean) Raw() *schema.Schema {
 
 func (o Boolean) Title() string {
 	return o.Schema.Title
+}
+
+func (o Boolean) Format() string {
+	return string(o.Schema.Format)
 }
 
 func (o Boolean) Key() string {

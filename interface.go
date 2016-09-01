@@ -16,24 +16,24 @@ type Schema interface {
 
 type Root struct {
 	*hschema.HyperSchema
-	URL         *url.URL
-	Links       LinkList
-	Definitions []Schema
-	Properties  []Schema
-	Objects     []*Object
-	Arrays      []*Array
-	Strings     []*String
-	Numbers     []*Number
-	Integers    []*Integer
-	Booleans    []*Boolean
+	URL                 *url.URL
+	Links               LinkList
+	Definitions         []Schema
+	Properties          []Schema
+	Objects             []*Object
+	Arrays              []*Array
+	Strings             []*String
+	Numbers             []*Number
+	Integers            []*Integer
+	Booleans            []*Boolean
+	RequiredValidations []string
 }
-
-type ByTitle []Schema
-type ByKey []Header
 
 type Object struct {
 	*schema.Schema
+	NativeType  string
 	Type        string
+	Name        string
 	key         string
 	IsPrivate   bool
 	Validations []Validation
@@ -42,17 +42,21 @@ type Object struct {
 
 type Array struct {
 	*schema.Schema
+	NativeType  string
 	Type        string
+	Name        string
 	key         string
 	IsPrivate   bool
 	Validations []Validation
-	Items       *ItemSpec
 	Item        Schema
+	Items       *ItemSpec
 }
 
 type String struct {
 	*schema.Schema
+	NativeType  string
 	Type        string
+	Name        string
 	key         string
 	IsPrivate   bool
 	Validations []Validation
@@ -60,7 +64,9 @@ type String struct {
 
 type Number struct {
 	*schema.Schema
+	NativeType  string
 	Type        string
+	Name        string
 	key         string
 	IsPrivate   bool
 	Validations []Validation
@@ -68,7 +74,9 @@ type Number struct {
 
 type Integer struct {
 	*schema.Schema
+	NativeType  string
 	Type        string
+	Name        string
 	key         string
 	IsPrivate   bool
 	Validations []Validation
@@ -76,7 +84,9 @@ type Integer struct {
 
 type Boolean struct {
 	*schema.Schema
+	NativeType  string
 	Type        string
+	Name        string
 	key         string
 	IsPrivate   bool
 	Validations []Validation
