@@ -1,117 +1,128 @@
 package jstmpl
 
 import (
-	"bytes"
 	"fmt"
 	"net/url"
 	"sort"
-	"strings"
 
+	"github.com/go-jstmpl/go-jstmpl/types"
 	"github.com/lestrrat/go-jshschema"
 	"github.com/lestrrat/go-jsschema"
 )
+
+type Builder struct {
+	Schema *schema.Schema
+}
 
 func NewBuilder() *Builder {
 	return &Builder{}
 }
 
-func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
+func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 	var err error
 
-	m := &Root{
+	m := &types.Root{
 		HyperSchema: hs,
-		Links:       make(LinkList, len(hs.Links)),
+		Links:       make(types.LinkList, len(hs.Links)),
 	}
-	str := getString(hs.Schema.Extras, "href")
+	str := hs.Schema.Extras["href"].(string)
 	m.URL, err = url.Parse(str)
 	if err != nil {
 		return nil, err
 	}
 
-	var ds, os, as, ss, ns, is, bs, ps []Schema
+	ctx := &types.Context{
+		Validations: map[string]bool{},
+	}
 
-	for _, s := range hs.Definitions {
-		rs, err := resolve(s, hs.Schema, "")
+	var ds, os, as, ss, ns, is, bs, ps []types.Schema
+
+	for k, s := range hs.Definitions {
+		ctx.Key = k
+		rs, err := resolve(s, hs.Schema, ctx)
 		if err != nil {
 			return nil, err
 		}
 		ds = append(ds, rs)
 		func(s interface{}) {
 			switch ts := s.(type) {
-			case *Object:
+			case *types.Object:
 				os = append(os, ts)
-			case *Array:
+			case *types.Array:
 				as = append(as, ts)
-			case *String:
+			case *types.String:
 				ss = append(ss, ts)
-			case *Number:
+			case *types.Number:
 				ns = append(ns, ts)
-			case *Integer:
+			case *types.Integer:
 				is = append(is, ts)
-			case *Boolean:
+			case *types.Boolean:
 				bs = append(bs, ts)
 			}
 		}(rs)
 	}
 
-	for _, s := range hs.Properties {
-		rs, err := resolve(s, hs.Schema, "")
+	for k, s := range hs.Properties {
+		ctx.Key = k
+		rs, err := resolve(s, hs.Schema, ctx)
 		if err != nil {
 			return nil, err
 		}
 		ps = append(ps, rs)
 	}
 
-	sort.Sort(ByTitle(ds))
-	sort.Sort(ByTitle(os))
-	sort.Sort(ByTitle(as))
-	sort.Sort(ByTitle(ss))
-	sort.Sort(ByTitle(ns))
-	sort.Sort(ByTitle(is))
-	sort.Sort(ByTitle(bs))
-	sort.Sort(ByTitle(ps))
+	sort.Sort(types.SchemasByKey(ds))
+	sort.Sort(types.SchemasByKey(os))
+	sort.Sort(types.SchemasByKey(as))
+	sort.Sort(types.SchemasByKey(ss))
+	sort.Sort(types.SchemasByKey(ns))
+	sort.Sort(types.SchemasByKey(is))
+	sort.Sort(types.SchemasByKey(bs))
+	sort.Sort(types.SchemasByKey(ps))
 
 	m.Definitions = ds
-	m.Objects = make([]*Object, len(os))
+	m.Objects = make([]*types.Object, len(os))
 	for i, v := range os {
-		m.Objects[i] = v.(*Object)
+		m.Objects[i] = v.(*types.Object)
 	}
-	m.Arrays = make([]*Array, len(as))
+	m.Arrays = make([]*types.Array, len(as))
 	for i, v := range as {
-		m.Arrays[i] = v.(*Array)
+		m.Arrays[i] = v.(*types.Array)
 	}
-	m.Strings = make([]*String, len(ss))
+	m.Strings = make([]*types.String, len(ss))
 	for i, v := range ss {
-		m.Strings[i] = v.(*String)
+		m.Strings[i] = v.(*types.String)
 	}
-	m.Numbers = make([]*Number, len(ns))
+	m.Numbers = make([]*types.Number, len(ns))
 	for i, v := range ns {
-		m.Numbers[i] = v.(*Number)
+		m.Numbers[i] = v.(*types.Number)
 	}
-	m.Integers = make([]*Integer, len(is))
+	m.Integers = make([]*types.Integer, len(is))
 	for i, v := range is {
-		m.Integers[i] = v.(*Integer)
+		m.Integers[i] = v.(*types.Integer)
 	}
-	m.Booleans = make([]*Boolean, len(bs))
+	m.Booleans = make([]*types.Boolean, len(bs))
 	for i, v := range bs {
-		m.Booleans[i] = v.(*Boolean)
+		m.Booleans[i] = v.(*types.Boolean)
 	}
 	m.Properties = ps
 
 	for i, l := range hs.Links {
 		var (
-			s, ts Schema
+			s, ts types.Schema
 		)
 
 		if l.Schema != nil {
-			s, err = resolve(l.Schema, hs.Schema, "")
+			ctx.Key = ""
+			s, err = resolve(l.Schema, hs.Schema, ctx)
 			if err != nil {
 				return nil, err
 			}
 		}
 
 		if l.TargetSchema != nil {
-			ts, err = resolve(l.TargetSchema, hs.Schema, "")
+			ctx.Key = ""
+			ts, err = resolve(l.TargetSchema, hs.Schema, ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -121,7 +132,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 		if err != nil {
 			return nil, err
 		}
-		m.Links[i] = &Link{
+		m.Links[i] = &types.Link{
 			Link:         *l,
 			URL:          u,
 			Schema:       s,
@@ -129,32 +140,38 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*Root, error) {
 		}
 	}
 
+	m.RequiredValidations = ctx.RequiredValidations()
+
 	return m, nil
 }
 
-func resolve(src, ctx *schema.Schema, propName string) (Schema, error) {
-	rs, err := src.Resolve(ctx)
+func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
+	rs, err := s.Resolve(t)
 	if err != nil {
 		return nil, err
 	}
 
-	var ts Schema
+	var ts types.Schema
 	if rs.Type.Contains(schema.ObjectType) {
-		obj := NewObject(propName, rs)
+		obj := types.NewObject(ctx, rs)
 		for key, sp := range rs.Properties {
 			if sp != nil {
-				dp, err := resolve(sp, ctx, key)
+				ctx.Key = key
+				dp, err := resolve(sp, t, ctx)
 				if err != nil {
 					return nil, err
 				}
-				obj.Properties = append(obj.Properties, dp)
+				ps := append(obj.Properties, dp)
+				sort.Sort(types.SchemasByKey(ps))
+				obj.Properties = ps
 			}
 		}
 		ts = obj
 	} else if rs.Type.Contains(schema.ArrayType) {
-		arr := NewArray(propName, rs)
+		arr := types.NewArray(ctx, rs)
 		for i, sp := range rs.Items.Schemas {
-			dp, err := resolve(sp, ctx, "")
+			ctx.Key = ""
+			dp, err := resolve(sp, t, ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -165,63 +182,16 @@ func resolve(src, ctx *schema.Schema, propName string) (Schema, error) {
 		}
 		ts = arr
 	} else if rs.Type.Contains(schema.StringType) {
-		ts = NewString(propName, rs)
+		ts = types.NewString(ctx, rs)
 	} else if rs.Type.Contains(schema.NumberType) {
-		ts = NewNumber(propName, rs)
+		ts = types.NewNumber(ctx, rs)
 	} else if rs.Type.Contains(schema.IntegerType) {
-		ts = NewInteger(propName, rs)
+		ts = types.NewInteger(ctx, rs)
 	} else if rs.Type.Contains(schema.BooleanType) {
-		ts = NewBoolean(propName, rs)
+		ts = types.NewBoolean(ctx, rs)
 	} else {
 		return nil, fmt.Errorf("undefined type: %+v", rs)
 	}
 
-	// if rs.Items != nil {
-	// 	dest.Items = &ItemSpec{
-	// 		ItemSpec: rs.Items,
-	// 		Schemas:  make([]*Schema, len(rs.Items.Schemas)),
-	// 	}
-	// 	for i, sp := range rs.Items.Schemas {
-	// 		dp, err := resolve(sp, ctx)
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 		dest.Items.Schemas[i] = dp
-	// 	}
-	// }
-
 	return ts, nil
-}
-
-func TitleToClassName(s string) string {
-	if s == "" {
-		return ""
-	}
-	buf := bytes.Buffer{}
-	for _, p := range rspace.Split(s, -1) {
-		buf.WriteString(strings.ToUpper(p[:1]))
-		buf.WriteString(p[1:])
-	}
-	return buf.String()
-}
-
-func KeyToPropName(s string) string {
-	if s == "" {
-		return ""
-	}
-	buf := bytes.Buffer{}
-	for i, p := range rsnake.Split(s, -1) {
-		if i == 0 {
-			buf.WriteString(p)
-			continue
-		}
-		buf.WriteString(strings.ToUpper(p[:1]))
-		buf.WriteString(p[1:])
-	}
-	return buf.String()
-}
-
-func getString(extras map[string]interface{}, key string) string {
-	v, _ := extras[key].(string)
-	return v
 }
