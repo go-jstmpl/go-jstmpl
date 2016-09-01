@@ -1,0 +1,7 @@
+package: github.com/go-jstmpl/go-jstmpl
+import:
+- package: github.com/ghodss/yaml
+- package: github.com/jessevdk/go-flags
+  version: ^1.0.0
+- package: github.com/lestrrat/go-jshschema
+- package: github.com/lestrrat/go-jsschema
