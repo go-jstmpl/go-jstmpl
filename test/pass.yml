@@ -1,0 +1,53 @@
+title: builder
+definitions:
+  test_integer:
+    title: test integer
+    type: integer
+  test_boolean:
+    title: test boolean
+    type: boolean
+  test_number:
+    title: test number
+    type: number
+  test_array:
+    title: test array
+    type: array
+    items:
+      title: test element
+      type: integer
+  test_object:
+    title: test object
+    type: object
+  test_string:
+    title: test string
+    type: string
+
+properties:
+  test_properties:
+    title: test properties
+    type: object
+  test_link_properties:
+    $ref: '#/definitions/test_object'
+
+href: https://builder.com
+links:
+
+- title: Create test
+  description: test description
+  rel: create
+  href: /test
+  method: POST
+  schema:
+    title: schema
+    type: object
+    properties:
+      links_test:
+        title: test_column
+        type: integer
+      links_link_test:
+              $ref: '#/definitions/test_object'   
+
+    required:
+      - test
+  targetSchema:
+    $ref: '#/definitions/test_object'
