@@ -1,0 +1,8 @@
+title: resolve pass
+definitions:
+  test:
+    title: test
+    type: object
+  test_link:
+    $ref: "#/definitions/test"
+   
