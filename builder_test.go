@@ -29,6 +29,18 @@ func ParseHschema(file string) (*hschema.HyperSchema, error) {
 	return hs, nil
 }
 
+func TestBuilderLoopRef(t *testing.T) {
+	hs, err := ParseHschema("./test/ref_loop.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := NewBuilder()
+	_, err = b.Build(hs)
+	if err == nil {
+		t.Fatalf("build should be failed: %+v", b)
+	}
+}
+
 func TestBuillderNotHaveHref(t *testing.T) {
 	hs, err := ParseHschema("./test/has_not_href.yml")
 	if err != nil {
@@ -114,7 +126,7 @@ func TestBuilderPassBuild(t *testing.T) {
 
 	for _, v := range ts.Properties {
 		switch v.Key() {
-		case "test_multitype_in_link":
+		case "test_multitype_link":
 			if v.Title() != "test multitype" {
 				t.Errorf("fail to get Properties type not link extra schema: %+v", v)
 			}
@@ -136,7 +148,7 @@ func TestBuilderPassBuild(t *testing.T) {
 		case *jstypes.Object:
 			for _, p := range obj.Properties {
 				switch p.Key() {
-				case "test_multitype_in_link":
+				case "test_multitype_link":
 					if p.Title() != "test multitype" {
 						t.Errorf("fail to get Links type link schema: %+v", p)
 					}
