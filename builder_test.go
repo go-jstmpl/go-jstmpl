@@ -88,9 +88,10 @@ func TestBuilderPassBuild(t *testing.T) {
 		t.Errorf("fail to get Numbers type schema: %+v", ts.Numbers[0])
 	}
 
-	if len(ts.Integers) != 1 {
+	if len(ts.Integers) != 2 {
 		t.Fatal("fail to parse Integer type schema")
 	}
+
 	if ts.Integers[0] == nil || ts.Integers[0].Title() != "test integer" {
 		t.Errorf("fail to get Integer type schema: %+v", ts.Integers[0])
 	}
@@ -107,18 +108,22 @@ func TestBuilderPassBuild(t *testing.T) {
 		t.Fatal("fail to parse Properties type schema")
 	}
 
+	if len(ts.Definitions) != 7 {
+		t.Fatal("fail to parse Definitions")
+	}
+
 	for _, v := range ts.Properties {
 		switch v.Key() {
-		case "test_properties":
-			if v.Title() != "test properties" {
-				t.Errorf("fail to get Properties type not link schema: %+v", v)
+		case "test_multitype_in_link":
+			if v.Title() != "test multitype" {
+				t.Errorf("fail to get Properties type not link extra schema: %+v", v)
 			}
-		case "test_link_properties":
-			if v.Title() != "test object" {
-				t.Errorf("fail to get Properties type link schema: %+v", v)
+		case "test_multitype":
+			if v.Title() != "test multitype" {
+				t.Errorf("fail to get Properties type link extra schema: %+v", v)
 			}
 		default:
-			t.Errorf("fail to get Properties type schema, specify one of key")
+			t.Errorf("fail to get Properties type schema, specify one of key: %s", v)
 		}
 	}
 
@@ -131,24 +136,21 @@ func TestBuilderPassBuild(t *testing.T) {
 		case *jstypes.Object:
 			for _, p := range obj.Properties {
 				switch p.Key() {
-				case "links_test":
-					if p.Title() != "test_column" {
-						t.Errorf("failt to get Links type not link schema: %+v", p)
-					}
-				case "links_link_test":
-					if p.Title() != "test object" {
+				case "test_multitype_in_link":
+					if p.Title() != "test multitype" {
 						t.Errorf("fail to get Links type link schema: %+v", p)
 					}
+				case "test_multitype":
+					if p.Title() != "test multitype" {
+						t.Errorf("fail to get Links type not link schema: %+v", p)
+					}
 				default:
-					t.Error("failt to get Links type schema, specify one of keys")
+					t.Errorf("failt to get Links type schema, specify one of keys: %+v", p)
 				}
 			}
 		default:
 			t.Errorf("fail to get Links type, should be object schema: %+v", v)
 		}
-	}
-	if len(ts.Definitions) != 6 {
-		t.Fatal("fail to parse Definitions")
 	}
 }
 
