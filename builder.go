@@ -192,7 +192,7 @@ func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
 	} else if rs.Type.Contains(schema.BooleanType) {
 		ts = types.NewBoolean(ctx, rs)
 	} else {
-		return nil, fmt.Errorf("undefined type: %+v", rs)
+		ts = types.NewUndefined(ctx, rs)
 	}
 
 	return ts, nil
