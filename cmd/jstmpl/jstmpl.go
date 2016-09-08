@@ -76,10 +76,18 @@ func _main() int {
 	}
 
 	if d := opts.DumpFile; d != "" {
+		// add properties and definitions data
 		b, err := yaml.Marshal(ts)
 		if err != nil {
 			log.Printf("fail to marshal Builder to YAML: %s", err)
 		}
+		// add link data
+		lb, err := yaml.Marshal(ts.Links)
+		if err != nil {
+			log.Printf("fail to marshal Builder to YAML: %s", err)
+		}
+
+		b = append(b, lb...)
 		switch d {
 		case "stdout":
 			fmt.Printf("%s", b)
@@ -91,6 +99,9 @@ func _main() int {
 	}
 
 	err = filepath.Walk(opts.Template, func(i string, info os.FileInfo, err error) error {
+		if info == nil {
+			return fmt.Errorf("fail to find a template file or dir: %s", i)
+		}
 		if info.IsDir() {
 			return nil
 		}
