@@ -51,4 +51,4 @@ links:
       - test
   targetSchema:
     $ref: '#/definitions/test_object'
-    
+   
