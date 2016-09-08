@@ -29,6 +29,22 @@ func ParseHschema(file string) (*hschema.HyperSchema, error) {
 	return hs, nil
 }
 
+func TestBuillderNotHaveHref(t *testing.T) {
+	hs, err := ParseHschema("./test/has_not_href.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := NewBuilder()
+	ts, err := b.Build(hs)
+	if err != nil {
+		t.Fatalf("fail to build: %s", err)
+	}
+
+	if ts.Title != "has not href" {
+		t.Error("fail to get title")
+	}
+}
+
 func TestBuilderPassBuild(t *testing.T) {
 	hs, err := ParseHschema("./test/pass.yml")
 	if err != nil {

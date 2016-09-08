@@ -25,12 +25,14 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 		HyperSchema: hs,
 		Links:       make(types.LinkList, len(hs.Links)),
 	}
-	str := hs.Schema.Extras["href"].(string)
-	m.URL, err = url.Parse(str)
-	if err != nil {
-		return nil, err
-	}
+	if hs.Schema.Extras["href"] != nil {
+		str := hs.Schema.Extras["href"].(string)
 
+		m.URL, err = url.Parse(str)
+		if err != nil {
+			return nil, err
+		}
+	}
 	ctx := &types.Context{
 		Validations: map[string]bool{},
 	}

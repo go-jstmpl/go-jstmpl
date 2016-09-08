@@ -91,6 +91,9 @@ func _main() int {
 	}
 
 	err = filepath.Walk(opts.Template, func(i string, info os.FileInfo, err error) error {
+		if info == nil {
+			return fmt.Errorf("fail to find a template file or dir: %s", i)
+		}
 		if info.IsDir() {
 			return nil
 		}
