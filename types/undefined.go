@@ -7,21 +7,28 @@ import (
 )
 
 type Undefined struct {
-	*schema.Schema
-	NativeType  string
-	Type        string
-	Name        string
-	key         string
-	IsPrivate   bool
-	Validations []validations.Validation
+	Schema      *schema.Schema           `json:"-"`
+	NativeType  string                   `json:"-"`
+	GoType      string                   `json:",omitempty"`
+	ColumnName  string                   `json:",omitempty"`
+	ColumnType  string                   `json:",omitempty"`
+	Type        string                   `json:",omitempty"`
+	Name        string                   `json:",omitempty"`
+	key         string                   `json:",omitempty"`
+	IsPrivate   bool                     `json:"-"`
+	Validations []validations.Validation `json:"-"`
 }
 
 func NewUndefined(ctx *Context, s *schema.Schema) *Undefined {
 	vs := []validations.Validation{}
+	gt, cn, ct, _ := helpers.GetExtraData(s)
 	return &Undefined{
 		Schema:      s,
 		NativeType:  "undefined",
 		Type:        "undefined",
+		GoType:      gt,
+		ColumnName:  cn,
+		ColumnType:  ct,
 		Name:        helpers.SpaceToUpperCamelCase(s.Title),
 		key:         ctx.Key,
 		IsPrivate:   true,

@@ -62,7 +62,7 @@ var (
 type LinkList []*Link
 
 type Link struct {
-	hschema.Link
+	Link         hschema.Link `json:"-"`
 	URL          *url.URL
 	Schema       Schema
 	TargetSchema Schema
@@ -110,7 +110,7 @@ func (l Link) ReqBody() string {
 }
 
 func (l Link) ResStatusCode() int {
-	return statusCodes[l.Method]
+	return statusCodes[l.Link.Method]
 }
 
 func (l Link) ResReasonPhrase() string {

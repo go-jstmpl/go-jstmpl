@@ -7,13 +7,16 @@ import (
 )
 
 type Number struct {
-	*schema.Schema
-	NativeType  string
-	Type        string
-	Name        string
-	key         string
-	IsPrivate   bool
-	Validations []validations.Validation
+	Schema      *schema.Schema           `json:"-"`
+	NativeType  string                   `json:"-"`
+	GoType      string                   `json:",omitempty"`
+	ColumnName  string                   `json:",omitempty"`
+	ColumnType  string                   `json:",omitempty"`
+	Type        string                   `json:",omitempty"`
+	Name        string                   `json:",omitempty"`
+	key         string                   `json:",omitempty"`
+	IsPrivate   bool                     `json:"-"`
+	Validations []validations.Validation `json:"-"`
 }
 
 func NewNumber(ctx *Context, s *schema.Schema) *Number {
@@ -26,10 +29,14 @@ func NewNumber(ctx *Context, s *schema.Schema) *Number {
 		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
+	gt, cn, ct, _ := helpers.GetExtraData(s)
 	return &Number{
 		Schema:      s,
 		NativeType:  "number",
 		Type:        "number",
+		GoType:      gt,
+		ColumnName:  cn,
+		ColumnType:  ct,
 		Name:        helpers.SpaceToUpperCamelCase(s.Title),
 		key:         ctx.Key,
 		IsPrivate:   true,

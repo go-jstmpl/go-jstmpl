@@ -7,13 +7,16 @@ import (
 )
 
 type String struct {
-	*schema.Schema
-	NativeType  string
-	Type        string
-	Name        string
-	key         string
-	IsPrivate   bool
-	Validations []validations.Validation
+	Schema      *schema.Schema           `json:"-"`
+	NativeType  string                   `json:"-"`
+	GoType      string                   `json:",omitempty"`
+	ColumnName  string                   `json:",omitempty"`
+	ColumnType  string                   `json:",omitempty"`
+	Type        string                   `json:",omitempty"`
+	Name        string                   `json:",omitempty"`
+	key         string                   `json:",omitempty"`
+	IsPrivate   bool                     `json:"-"`
+	Validations []validations.Validation `json:"-"`
 }
 
 func NewString(ctx *Context, s *schema.Schema) *String {
@@ -34,10 +37,14 @@ func NewString(ctx *Context, s *schema.Schema) *String {
 		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
+	gt, cn, ct, _ := helpers.GetExtraData(s)
 	return &String{
 		Schema:      s,
 		NativeType:  "string",
 		Type:        "string",
+		GoType:      gt,
+		ColumnName:  cn,
+		ColumnType:  ct,
 		Name:        helpers.SpaceToUpperCamelCase(s.Title),
 		key:         ctx.Key,
 		IsPrivate:   true,

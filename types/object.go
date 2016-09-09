@@ -7,20 +7,27 @@ import (
 )
 
 type Object struct {
-	*schema.Schema
-	NativeType  string
-	Type        string
-	Name        string
-	key         string
-	IsPrivate   bool
-	Validations []validations.Validation
+	Schema      *schema.Schema           `json:"-"`
+	NativeType  string                   `json:"-"`
+	GoType      string                   `json:",omitempty"`
+	ColumnName  string                   `json:",omitempty"`
+	ColumnType  string                   `json:",omitempty"`
+	Type        string                   `json:",omitempty"`
+	Name        string                   `json:",omitempty"`
+	key         string                   `json:",omitempty"`
+	IsPrivate   bool                     `json:"-"`
+	Validations []validations.Validation `json:"-"`
 	Properties  []Schema
 }
 
 func NewObject(ctx *Context, s *schema.Schema) *Object {
+	gt, cn, ct, _ := helpers.GetExtraData(s)
 	return &Object{
 		Schema:     s,
 		NativeType: "object",
+		GoType:     gt,
+		ColumnName: cn,
+		ColumnType: ct,
 		Type:       helpers.SpaceToUpperCamelCase(s.Title),
 		Name:       helpers.SpaceToUpperCamelCase(s.Title),
 		key:        ctx.Key,
