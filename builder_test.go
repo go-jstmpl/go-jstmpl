@@ -52,7 +52,7 @@ func TestBuillderNotHaveHref(t *testing.T) {
 		t.Fatalf("fail to build: %s", err)
 	}
 
-	if ts.Title != "has not href" {
+	if ts.HyperSchema.Title != "has not href" {
 		t.Error("fail to get title")
 	}
 }
@@ -126,14 +126,26 @@ func TestBuilderPassBuild(t *testing.T) {
 
 	for _, v := range ts.Properties {
 		switch v.Key() {
-		case "test_multitype_link":
-			if v.Title() != "test multitype" {
-				t.Errorf("fail to get Properties type not link extra schema: %+v", v)
-			}
 		case "test_multitype":
-			if v.Title() != "test multitype" {
-				t.Errorf("fail to get Properties type link extra schema: %+v", v)
+			i, ok := v.(*jstypes.Integer)
+			if ok != true {
+				t.Errorf("fail to get Properties type not link extra schema: Type Convert:%+v", v)
+				continue
 			}
+			if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
+				t.Errorf("fail to get Properties type not link extra schema: Parse: %+v", v)
+			}
+
+		case "test_multitype_link":
+			i, ok := v.(*jstypes.Integer)
+			if ok != true {
+				t.Errorf("fail to get Properties type link extra schema: Type Convert:%+v", v)
+				continue
+			}
+			if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
+				t.Errorf("fail to get Properties type link extra schema: Parse: %+v", v)
+			}
+
 		default:
 			t.Errorf("fail to get Properties type schema, specify one of key: %s", v)
 		}
@@ -148,13 +160,24 @@ func TestBuilderPassBuild(t *testing.T) {
 		case *jstypes.Object:
 			for _, p := range obj.Properties {
 				switch p.Key() {
-				case "test_multitype_link":
-					if p.Title() != "test multitype" {
-						t.Errorf("fail to get Links type link schema: %+v", p)
-					}
 				case "test_multitype":
-					if p.Title() != "test multitype" {
-						t.Errorf("fail to get Links type not link schema: %+v", p)
+					i, ok := p.(*jstypes.Integer)
+					if ok != true {
+						t.Errorf("fail to get Links type not link extra schema: Type Convert:%+v", v)
+						continue
+					}
+					if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
+						t.Errorf("fail to get Properties type not link extra schema: Parse: %+v", v)
+					}
+
+				case "test_multitype_link":
+					i, ok := p.(*jstypes.Integer)
+					if ok != true {
+						t.Errorf("fail to get Links type link extra schema: Type Convert:%+v", v)
+						continue
+					}
+					if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
+						t.Errorf("fail to get Properties type link extra schema: Parse: %+v", v)
 					}
 				default:
 					t.Errorf("failt to get Links type schema, specify one of keys: %+v", p)
