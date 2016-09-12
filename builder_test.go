@@ -133,7 +133,7 @@ func TestBuilderPassBuild(t *testing.T) {
 				continue
 			}
 			if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
-				t.Errorf("fail to get Properties type not link extra schema: Parse: %+v", v)
+				t.Errorf("fail to get Properties type not link extra schema: Parse: %+v", i)
 			}
 
 		case "test_multitype_link":
@@ -143,7 +143,7 @@ func TestBuilderPassBuild(t *testing.T) {
 				continue
 			}
 			if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
-				t.Errorf("fail to get Properties type link extra schema: Parse: %+v", v)
+				t.Errorf("fail to get Properties type link extra schema: Parse: %+v", i)
 			}
 
 		default:
@@ -167,7 +167,7 @@ func TestBuilderPassBuild(t *testing.T) {
 						continue
 					}
 					if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
-						t.Errorf("fail to get Properties type not link extra schema: Parse: %+v", v)
+						t.Errorf("fail to get Properties type not link extra schema: Parse: %+v", i)
 					}
 
 				case "test_multitype_link":
@@ -177,7 +177,7 @@ func TestBuilderPassBuild(t *testing.T) {
 						continue
 					}
 					if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
-						t.Errorf("fail to get Properties type link extra schema: Parse: %+v", v)
+						t.Errorf("fail to get Properties type link extra schema: Parse: %+v", i)
 					}
 				default:
 					t.Errorf("failt to get Links type schema, specify one of keys: %+v", p)
@@ -187,6 +187,29 @@ func TestBuilderPassBuild(t *testing.T) {
 			t.Errorf("fail to get Links type, should be object schema: %+v", v)
 		}
 	}
+}
+
+func TestBuilderConbinatrial(t *testing.T) {
+	hs, err := ParseHschema("./test/combine.yml")
+	if err != nil {
+		t.Fatalf("fail to parse resolve: %v", err)
+	}
+
+	b := NewBuilder()
+	ts, err := b.Build(hs)
+	if err != nil {
+		t.Fatalf("fail to build: %s", err)
+	}
+
+	p, ok := ts.Objects[0].Properties[0].(*jstypes.Integer)
+	if ok != true {
+		t.Fatalf("fail to type convert: should be integer type: %T", ts.Objects[0].Properties[0])
+	}
+
+	if p.Name != "TestParts" || p.ColumnName != "test_parts" {
+		t.Errorf("fail to parse conbinatrial definition: %+v", p)
+	}
+
 }
 
 func TestResolvePass(t *testing.T) {

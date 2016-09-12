@@ -7,22 +7,34 @@ import (
 )
 
 type Array struct {
-	Schema      *schema.Schema           `json:"-"`
-	NativeType  string                   `json:"-"`
-	GoType      string                   `json:",omitempty"`
-	ColumnName  string                   `json:",omitempty"`
-	ColumnType  string                   `json:",omitempty"`
-	Type        string                   `json:",omitempty"`
-	Name        string                   `json:",omitempty"`
-	key         string                   `json:",omitempty"`
+	Schema      *schema.Schema `json:"-"`
+	NativeType  string         `json:"-"`
+	GoType      string
+	ColumnName  string
+	ColumnType  string
+	Type        string
+	Name        string
+	key         string
 	IsPrivate   bool                     `json:"-"`
 	Validations []validations.Validation `json:"-"`
-	Item        Schema                   `json:",omitempty"`
-	Items       *ItemSpec                `json:",omitempty"`
+	Item        Schema
+	Items       *ItemSpec
 }
 
-func NewArray(ctx *Context, s *schema.Schema) *Array {
-	gt, cn, ct, _ := helpers.GetExtraData(s)
+func NewArray(ctx *Context, s, t *schema.Schema) *Array {
+	var gt, cn, ct string
+	if s.Extras["go_type"] != nil {
+		gt, _ = helpers.GetGoTypeData(s)
+	} else {
+		gt, _ = helpers.GetGoTypeData(t)
+	}
+
+	if s.Extras["column"] != nil {
+		cn, ct, _ = helpers.GetColumnData(s)
+	} else {
+		cn, ct, _ = helpers.GetColumnData(t)
+	}
+
 	return &Array{
 		Schema:     s,
 		NativeType: "array",

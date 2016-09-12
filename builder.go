@@ -152,10 +152,9 @@ func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	var ts types.Schema
 	if rs.Type.Contains(schema.ObjectType) {
-		obj := types.NewObject(ctx, rs)
+		obj := types.NewObject(ctx, rs, s)
 		for key, sp := range rs.Properties {
 			if sp != nil {
 				ctx.Key = key
@@ -170,7 +169,7 @@ func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
 		}
 		ts = obj
 	} else if rs.Type.Contains(schema.ArrayType) {
-		arr := types.NewArray(ctx, rs)
+		arr := types.NewArray(ctx, rs, s)
 		for i, sp := range rs.Items.Schemas {
 			ctx.Key = ""
 			dp, err := resolve(sp, t, ctx)
@@ -184,15 +183,15 @@ func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
 		}
 		ts = arr
 	} else if rs.Type.Contains(schema.StringType) {
-		ts = types.NewString(ctx, rs)
+		ts = types.NewString(ctx, rs, s)
 	} else if rs.Type.Contains(schema.NumberType) {
-		ts = types.NewNumber(ctx, rs)
+		ts = types.NewNumber(ctx, rs, s)
 	} else if rs.Type.Contains(schema.IntegerType) {
-		ts = types.NewInteger(ctx, rs)
+		ts = types.NewInteger(ctx, rs, s)
 	} else if rs.Type.Contains(schema.BooleanType) {
-		ts = types.NewBoolean(ctx, rs)
+		ts = types.NewBoolean(ctx, rs, s)
 	} else {
-		ts = types.NewUndefined(ctx, rs)
+		ts = types.NewUndefined(ctx, rs, s)
 	}
 
 	return ts, nil

@@ -24,15 +24,22 @@ func ConvertTypeForGo(ts schema.PrimitiveTypes) string {
 	return conv[ts[0].String()]
 }
 
-func GetExtraData(ts *schema.Schema) (gt, cn, ct string, err error) {
+func GetGoTypeData(ts *schema.Schema) (gt string, err error) {
+	if ts.Extras["go_type"] == nil {
+		return
+	}
+
+	s, ok := ts.Extras["go_type"].(string)
+	if ok != true {
+		err = fmt.Errorf("go_type %v is invalid type", ts.Extras["go_type"])
+	}
+	gt = s
+	return
+}
+
+func GetColumnData(ts *schema.Schema) (cn, ct string, err error) {
 	for k, v := range ts.Extras {
 		switch k {
-		case "go_type":
-			s, ok := v.(string)
-			if ok != true {
-				err = fmt.Errorf("go_type %v is invalid type", v)
-			}
-			gt = s
 		case "column":
 			m, ok := v.(map[string]interface{})
 			if ok != true {
