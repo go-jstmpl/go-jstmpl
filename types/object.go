@@ -9,6 +9,7 @@ import (
 type Object struct {
 	Schema      *schema.Schema `json:"-"`
 	NativeType  string         `json:"-"`
+	TableName   string
 	GoType      string
 	ColumnName  string
 	ColumnType  string
@@ -21,24 +22,16 @@ type Object struct {
 }
 
 func NewObject(ctx *Context, s, t *schema.Schema) *Object {
-	var gt, cn, ct string
-	if s.Extras["go_type"] != nil {
-		gt, _ = helpers.GetGoTypeData(s)
+	var tn string
+	if s.Extras["table"] != nil {
+		tn, _ = helpers.GetTableData(s)
 	} else {
-		gt, _ = helpers.GetGoTypeData(t)
-	}
-
-	if s.Extras["column"] != nil {
-		cn, ct, _ = helpers.GetColumnData(s)
-	} else {
-		cn, ct, _ = helpers.GetColumnData(t)
+		tn, _ = helpers.GetTableData(t)
 	}
 	return &Object{
 		Schema:     s,
 		NativeType: "object",
-		GoType:     gt,
-		ColumnName: cn,
-		ColumnType: ct,
+		TableName:  tn,
 		Type:       helpers.SpaceToUpperCamelCase(s.Title),
 		Name:       helpers.SpaceToUpperCamelCase(s.Title),
 		key:        ctx.Key,

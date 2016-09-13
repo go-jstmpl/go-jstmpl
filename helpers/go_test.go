@@ -16,6 +16,7 @@ type TestCaseConvertTagsForGo struct {
 type TestCaseExtras struct {
 	Extras           map[string]interface{}
 	ExpectColumnName string
+	ExpectTableName  string
 	ExpectDbType     string
 	ExpectGoType     string
 	Title            string
@@ -52,7 +53,7 @@ func TestConvertTagsForGo(t *testing.T) {
 	}
 }
 
-func TestGetGoData(t *testing.T) {
+func TestGetExtraData(t *testing.T) {
 
 	tests := []TestCaseExtras{{
 		Extras: map[string]interface{}{
@@ -81,6 +82,14 @@ func TestGetGoData(t *testing.T) {
 		ExpectDbType:     "db_type_test",
 		ExpectColumnName: "column_name_test",
 		Title:            "pass column column have value test",
+	}, {
+		Extras: map[string]interface{}{
+			"table": map[string]interface{}{
+				"name": "table_name_test",
+			},
+		},
+		ExpectTableName: "table_name_test",
+		Title:           "pass table column have value test",
 	}}
 
 	for _, test := range tests {
@@ -96,10 +105,15 @@ func TestGetGoData(t *testing.T) {
 			t.Errorf("%s: in GetColumnData, Extras: %s, Error: %s", test.Title, test.Extras, err)
 		}
 
-		if gt != test.ExpectGoType || cn != test.ExpectColumnName || ct != test.ExpectDbType {
-			t.Errorf("%s: Expect(%s, %s, %s), Result(%s, %s, %s)", test.Title,
-				test.ExpectGoType, test.ExpectColumnName, test.ExpectDbType,
-				gt, cn, ct)
+		tn, err := GetTableData(s)
+		if err != nil {
+			t.Errorf("%s: in GetTableData, Extras: %s, Error: %s", test.Title, test.Extras, err)
+		}
+
+		if gt != test.ExpectGoType || cn != test.ExpectColumnName || ct != test.ExpectDbType || tn != test.ExpectTableName {
+			t.Errorf("%s: Expect(%s, %s, %s, %s), Result(%s, %s, %s, %s)", test.Title,
+				test.ExpectGoType, test.ExpectColumnName, test.ExpectDbType, test.ExpectTableName,
+				gt, cn, ct, tn)
 		}
 	}
 }
