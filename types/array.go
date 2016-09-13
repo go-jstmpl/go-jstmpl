@@ -15,7 +15,8 @@ type Array struct {
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool                     `json:"-"`
+	IsPrivate   bool
+	Properties  []Schema
 	Validations []validations.Validation `json:"-"`
 	Item        Schema
 	Items       *ItemSpec
