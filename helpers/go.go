@@ -24,6 +24,23 @@ func ConvertTypeForGo(ts schema.PrimitiveTypes) string {
 	return conv[ts[0].String()]
 }
 
+func ConvertTagsForGo(n, cn string) string {
+	s := "`"
+	if n != "" {
+		s += fmt.Sprintf("json:\"%s, omitempty\" ", n)
+	} else {
+		s += fmt.Sprint("json:\"-\" ")
+	}
+
+	if cn != "" {
+		s += fmt.Sprintf("xorm:\"%s\"", cn)
+	} else {
+		s += fmt.Sprint("xorm:\"-\"")
+	}
+	s += "`"
+	return s
+}
+
 func GetGoTypeData(ts *schema.Schema) (gt string, err error) {
 	if ts.Extras["go_type"] == nil {
 		return
