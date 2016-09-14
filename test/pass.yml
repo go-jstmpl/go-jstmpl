@@ -24,7 +24,6 @@ definitions:
   test_multitype:
     title: test multitype
     type: integer
-    go_type: int
     column:
       name: test multitype
       db_type: int
@@ -35,7 +34,6 @@ properties:
   test_multitype:
     title: test multitype
     type: integer
-    go_type: int
     column:
       name: test multitype
       db_type: int
@@ -60,7 +58,6 @@ links:
       test_multitype:
         title: test multitype
         type: integer
-        go_type: int
         column:
           name: test multitype
           db_type: int

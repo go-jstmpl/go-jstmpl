@@ -3,7 +3,6 @@ definitions:
   test_integer:
     title: test parts
     type: integer
-    go_type: int
 
   test_object:
     title: test object

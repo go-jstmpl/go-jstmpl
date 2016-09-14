@@ -10,14 +10,13 @@ type Object struct {
 	Schema      *schema.Schema `json:"-"`
 	NativeType  string         `json:"-"`
 	TableName   string
-	GoType      string
 	ColumnName  string
 	ColumnType  string
 	Type        string
 	Name        string
 	key         string
 	IsPrivate   bool                     `json:"-"`
-	Validations []validations.Validation `json:"-"`
+	Validations []validations.Validation 
 	Properties  []Schema
 }
 
