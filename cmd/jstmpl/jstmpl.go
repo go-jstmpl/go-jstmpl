@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,6 +20,7 @@ func main() {
 }
 
 type options struct {
+	DumpFile string `short:"d" long:"dump" description:"output file to inter-generate data structure"`
 	Schema   string `short:"s" long:"schema" description:"the source JSON Schema file"`
 	OutDir   string `short:"o" long:"outfile" description:"output file to generate"`
 	Template string `short:"t" log:"tmpl" description:"template file to generate document"`
@@ -73,7 +75,26 @@ func _main() int {
 		return 1
 	}
 
+	if d := opts.DumpFile; d != "" {
+		b, err := yaml.Marshal(ts)
+		if err != nil {
+			log.Printf("fail to marshal Builder to YAML: %s", err)
+		}
+
+		switch d {
+		case "stdout":
+			fmt.Printf("%s", b)
+		default:
+			if err := ioutil.WriteFile(d, b, 0775); err != nil {
+				log.Printf("fail to write dump data at %s: %s", d, err)
+			}
+		}
+	}
+
 	err = filepath.Walk(opts.Template, func(i string, info os.FileInfo, err error) error {
+		if info == nil {
+			return fmt.Errorf("fail to find a template file or dir: %s", i)
+		}
 		if info.IsDir() {
 			return nil
 		}

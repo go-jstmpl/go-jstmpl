@@ -21,13 +21,29 @@ definitions:
   test_string:
     title: test string
     type: string
+  test_multitype:
+    title: test multitype
+    type: integer
+    go_type: int
+    column:
+      name: test multitype
+      db_type: int
+      foreign_key:
+        name: fk
 
 properties:
-  test_properties:
-    title: test properties
-    type: object
-  test_link_properties:
-    $ref: '#/definitions/test_object'
+  test_multitype:
+    title: test multitype
+    type: integer
+    go_type: int
+    column:
+      name: test multitype
+      db_type: int
+      foreign_key:
+        name: fk
+
+  test_multitype_link:
+    $ref: '#/definitions/test_multitype'
 
 href: https://builder.com
 links:
@@ -41,11 +57,18 @@ links:
     title: schema
     type: object
     properties:
-      links_test:
-        title: test_column
+      test_multitype:
+        title: test multitype
         type: integer
-      links_link_test:
-              $ref: '#/definitions/test_object'   
+        go_type: int
+        column:
+          name: test multitype
+          db_type: int
+          foreign_key:
+            name: fk
+
+      test_multitype_link:
+        $ref: '#/definitions/test_multitype'   
 
     required:
       - test

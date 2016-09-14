@@ -25,12 +25,14 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 		HyperSchema: hs,
 		Links:       make(types.LinkList, len(hs.Links)),
 	}
-	str := hs.Schema.Extras["href"].(string)
-	m.URL, err = url.Parse(str)
-	if err != nil {
-		return nil, err
-	}
+	if hs.Schema.Extras["href"] != nil {
+		str := hs.Schema.Extras["href"].(string)
 
+		m.URL, err = url.Parse(str)
+		if err != nil {
+			return nil, err
+		}
+	}
 	ctx := &types.Context{
 		Validations: map[string]bool{},
 	}
@@ -147,10 +149,10 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 
 func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
 	rs, err := s.Resolve(t)
+	ctx.Raw = s
 	if err != nil {
 		return nil, err
 	}
-
 	var ts types.Schema
 	if rs.Type.Contains(schema.ObjectType) {
 		obj := types.NewObject(ctx, rs)

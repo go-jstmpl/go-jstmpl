@@ -27,7 +27,7 @@ func (a ByTitle) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByTitle) Less(i, j int) bool { return a[i].Title() < a[j].Title() }
 
 type Root struct {
-	*hschema.HyperSchema
+	HyperSchema         *hschema.HyperSchema `json:"-"`
 	URL                 *url.URL
 	Links               LinkList
 	Definitions         []Schema

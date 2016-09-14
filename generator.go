@@ -25,6 +25,7 @@ func (g *Generator) Process(out io.Writer, model *types.Root, tmpl []byte) error
 		"joinTypes":             helpers.JoinTypes,
 		"serialize":             helpers.Serialize,
 		"convertTypeForGo":      helpers.ConvertTypeForGo,
+		"convertTagsForGo":      helpers.ConvertTagsForGo,
 	}).Parse(string(tmpl)))
 	if err := t.Execute(out, model); err != nil {
 		return err

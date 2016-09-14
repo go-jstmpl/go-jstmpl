@@ -1,0 +1,16 @@
+title: conbinatrial
+definitions:
+  test_integer:
+    title: test parts
+    type: integer
+    go_type: int
+
+  test_object:
+    title: test object
+    type: object
+    properties:
+        conbinatrial:
+            $ref: '#/definitions/test_integer'
+            column:
+                name: test_parts
+                db_type: test_db_type
