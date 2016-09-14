@@ -19,7 +19,7 @@ type String struct {
 	Validations []validations.Validation `json:"-"`
 }
 
-func NewString(ctx *Context, s, t *schema.Schema) *String {
+func NewString(ctx *Context, s *schema.Schema) *String {
 	vs := []validations.Validation{}
 	if v, err := validations.NewFormatValidation(s); err == nil {
 		ctx.AddValidation(v)
@@ -41,13 +41,13 @@ func NewString(ctx *Context, s, t *schema.Schema) *String {
 	if s.Extras["go_type"] != nil {
 		gt, _ = helpers.GetGoTypeData(s)
 	} else {
-		gt, _ = helpers.GetGoTypeData(t)
+		gt, _ = helpers.GetGoTypeData(ctx.Raw)
 	}
 
 	if s.Extras["column"] != nil {
 		cn, ct, _ = helpers.GetColumnData(s)
 	} else {
-		cn, ct, _ = helpers.GetColumnData(t)
+		cn, ct, _ = helpers.GetColumnData(ctx.Raw)
 	}
 	return &String{
 		Schema:      s,

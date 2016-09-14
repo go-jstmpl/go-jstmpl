@@ -21,12 +21,12 @@ type Object struct {
 	Properties  []Schema
 }
 
-func NewObject(ctx *Context, s, t *schema.Schema) *Object {
+func NewObject(ctx *Context, s *schema.Schema) *Object {
 	var tn string
 	if s.Extras["table"] != nil {
 		tn, _ = helpers.GetTableData(s)
 	} else {
-		tn, _ = helpers.GetTableData(t)
+		tn, _ = helpers.GetTableData(ctx.Raw)
 	}
 	return &Object{
 		Schema:     s,

@@ -4,10 +4,12 @@ import (
 	"sort"
 
 	"github.com/go-jstmpl/go-jstmpl/validations"
+	"github.com/lestrrat/go-jsschema"
 )
 
 type Context struct {
 	Key         string
+	Raw         *schema.Schema
 	Validations map[string]bool
 }
 

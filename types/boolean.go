@@ -19,19 +19,19 @@ type Boolean struct {
 	Validations []validations.Validation `json:"-"`
 }
 
-func NewBoolean(ctx *Context, s, t *schema.Schema) *Boolean {
+func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 	vs := []validations.Validation{}
 	var gt, cn, ct string
 	if s.Extras["go_type"] != nil {
 		gt, _ = helpers.GetGoTypeData(s)
 	} else {
-		gt, _ = helpers.GetGoTypeData(t)
+		gt, _ = helpers.GetGoTypeData(ctx.Raw)
 	}
 
 	if s.Extras["column"] != nil {
 		cn, ct, _ = helpers.GetColumnData(s)
 	} else {
-		cn, ct, _ = helpers.GetColumnData(t)
+		cn, ct, _ = helpers.GetColumnData(ctx.Raw)
 	}
 	return &Boolean{
 		Schema:      s,

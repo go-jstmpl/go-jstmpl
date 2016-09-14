@@ -19,7 +19,7 @@ type Number struct {
 	Validations []validations.Validation `json:"-"`
 }
 
-func NewNumber(ctx *Context, s, t *schema.Schema) *Number {
+func NewNumber(ctx *Context, s *schema.Schema) *Number {
 	vs := []validations.Validation{}
 	if v, err := validations.NewMaximumValidation(s); err == nil {
 		ctx.AddValidation(v)
@@ -33,13 +33,13 @@ func NewNumber(ctx *Context, s, t *schema.Schema) *Number {
 	if s.Extras["go_type"] != nil {
 		gt, _ = helpers.GetGoTypeData(s)
 	} else {
-		gt, _ = helpers.GetGoTypeData(t)
+		gt, _ = helpers.GetGoTypeData(ctx.Raw)
 	}
 
 	if s.Extras["column"] != nil {
 		cn, ct, _ = helpers.GetColumnData(s)
 	} else {
-		cn, ct, _ = helpers.GetColumnData(t)
+		cn, ct, _ = helpers.GetColumnData(ctx.Raw)
 	}
 	return &Number{
 		Schema:      s,

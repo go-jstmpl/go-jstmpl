@@ -19,19 +19,19 @@ type Undefined struct {
 	Validations []validations.Validation `json:"-"`
 }
 
-func NewUndefined(ctx *Context, s, t *schema.Schema) *Undefined {
+func NewUndefined(ctx *Context, s *schema.Schema) *Undefined {
 	vs := []validations.Validation{}
 	var gt, cn, ct string
 	if s.Extras["go_type"] != nil {
 		gt, _ = helpers.GetGoTypeData(s)
 	} else {
-		gt, _ = helpers.GetGoTypeData(t)
+		gt, _ = helpers.GetGoTypeData(ctx.Raw)
 	}
 
 	if s.Extras["column"] != nil {
 		cn, ct, _ = helpers.GetColumnData(s)
 	} else {
-		cn, ct, _ = helpers.GetColumnData(t)
+		cn, ct, _ = helpers.GetColumnData(ctx.Raw)
 	}
 	return &Undefined{
 		Schema:      s,
