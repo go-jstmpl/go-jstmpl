@@ -128,7 +128,7 @@ func TestBuilderPassBuild(t *testing.T) {
 		switch v.Key() {
 		case "test_multitype":
 			i, ok := v.(*jstypes.Integer)
-			if ok != true {
+			if !ok {
 				t.Errorf("fail to get Properties type not link extra schema: Type Convert:%+v", v)
 				continue
 			}
@@ -138,7 +138,7 @@ func TestBuilderPassBuild(t *testing.T) {
 
 		case "test_multitype_link":
 			i, ok := v.(*jstypes.Integer)
-			if ok != true {
+			if !ok {
 				t.Errorf("fail to get Properties type link extra schema: Type Convert:%+v", v)
 				continue
 			}
@@ -162,7 +162,7 @@ func TestBuilderPassBuild(t *testing.T) {
 				switch p.Key() {
 				case "test_multitype":
 					i, ok := p.(*jstypes.Integer)
-					if ok != true {
+					if !ok {
 						t.Errorf("fail to get Links type not link extra schema: Type Convert:%+v", v)
 						continue
 					}
@@ -172,7 +172,7 @@ func TestBuilderPassBuild(t *testing.T) {
 
 				case "test_multitype_link":
 					i, ok := p.(*jstypes.Integer)
-					if ok != true {
+					if !ok {
 						t.Errorf("fail to get Links type link extra schema: Type Convert:%+v", v)
 						continue
 					}
@@ -202,7 +202,7 @@ func TestBuilderConbinatrial(t *testing.T) {
 	}
 
 	p, ok := ts.Objects[0].Properties[0].(*jstypes.Integer)
-	if ok != true {
+	if !ok {
 		t.Fatalf("fail to type convert: should be integer type: %T", ts.Objects[0].Properties[0])
 	}
 
