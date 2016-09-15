@@ -157,6 +157,9 @@ func TestBuilderPassBuild(t *testing.T) {
 	}
 
 	for _, v := range ts.Links {
+		if v.Method != "POST" {
+			t.Errorf("fail to get Method: expect POST, but %s", v.Method)
+		}
 		switch obj := v.Schema.(type) {
 		case *jstypes.Object:
 			if len(obj.Required) != 1 || obj.Required[0] != "test" {
