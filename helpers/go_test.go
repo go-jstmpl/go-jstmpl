@@ -1,8 +1,9 @@
-package helpers
+package helpers_test
 
 import (
 	"testing"
 
+	"github.com/go-jstmpl/go-jstmpl/helpers"
 	"github.com/lestrrat/go-jsschema"
 )
 
@@ -45,7 +46,7 @@ func TestConvertTagsForGo(t *testing.T) {
 	}}
 
 	for _, test := range tests {
-		s := ConvertTagsForGo(test.Name, test.ColumnName)
+		s := helpers.ConvertTagsForGo(test.Name, test.ColumnName)
 		if test.Expect != s {
 			t.Errorf("%s: Expect: %s, Result: %s", test.Title, test.Expect, s)
 		}
@@ -87,12 +88,12 @@ func TestGetExtraData(t *testing.T) {
 		s := schema.New()
 		s.Extras = test.Extras
 
-		cn, ct, err := GetColumnData(s)
+		cn, ct, err := helpers.GetColumnData(s)
 		if err != nil {
 			t.Errorf("%s: in GetColumnData, Extras: %s, Error: %s", test.Title, test.Extras, err)
 		}
 
-		tn, err := GetTableData(s)
+		tn, err := helpers.GetTableData(s)
 		if err != nil {
 			t.Errorf("%s: in GetTableData, Extras: %s, Error: %s", test.Title, test.Extras, err)
 		}

@@ -41,7 +41,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 
 	for k, s := range hs.Definitions {
 		ctx.Key = k
-		rs, err := resolve(s, hs.Schema, ctx)
+		rs, err := Resolve(s, hs.Schema, ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -66,7 +66,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 
 	for k, s := range hs.Properties {
 		ctx.Key = k
-		rs, err := resolve(s, hs.Schema, ctx)
+		rs, err := Resolve(s, hs.Schema, ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -116,7 +116,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 
 		if l.Schema != nil {
 			ctx.Key = ""
-			s, err = resolve(l.Schema, hs.Schema, ctx)
+			s, err = Resolve(l.Schema, hs.Schema, ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -124,7 +124,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 
 		if l.TargetSchema != nil {
 			ctx.Key = ""
-			ts, err = resolve(l.TargetSchema, hs.Schema, ctx)
+			ts, err = Resolve(l.TargetSchema, hs.Schema, ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -147,7 +147,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 	return m, nil
 }
 
-func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
+func Resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
 	rs, err := s.Resolve(t)
 	ctx.Raw = s
 	if err != nil {
@@ -159,7 +159,7 @@ func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
 		for key, sp := range rs.Properties {
 			if sp != nil {
 				ctx.Key = key
-				dp, err := resolve(sp, t, ctx)
+				dp, err := Resolve(sp, t, ctx)
 				if err != nil {
 					return nil, err
 				}
@@ -173,7 +173,7 @@ func resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
 		arr := types.NewArray(ctx, rs)
 		for i, sp := range rs.Items.Schemas {
 			ctx.Key = ""
-			dp, err := resolve(sp, t, ctx)
+			dp, err := Resolve(sp, t, ctx)
 			if err != nil {
 				return nil, err
 			}
