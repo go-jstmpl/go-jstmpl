@@ -132,7 +132,7 @@ func TestBuilderPassBuild(t *testing.T) {
 				t.Errorf("fail to get Properties type not link extra schema: Type Convert:%+v", v)
 				continue
 			}
-			if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
+			if i.ColumnName != "test multitype" || i.ColumnType != "int" {
 				t.Errorf("fail to get Properties type not link extra schema: Parse: %+v", i)
 			}
 
@@ -142,7 +142,7 @@ func TestBuilderPassBuild(t *testing.T) {
 				t.Errorf("fail to get Properties type link extra schema: Type Convert:%+v", v)
 				continue
 			}
-			if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
+			if i.ColumnName != "test multitype" || i.ColumnType != "int" {
 				t.Errorf("fail to get Properties type link extra schema: Parse: %+v", i)
 			}
 
@@ -158,6 +158,9 @@ func TestBuilderPassBuild(t *testing.T) {
 	for _, v := range ts.Links {
 		switch obj := v.Schema.(type) {
 		case *jstypes.Object:
+			if len(obj.Required) != 1 || obj.Required[0] != "test" {
+				t.Errorf("fail to get Required: %v", obj.Required)
+			}
 			for _, p := range obj.Properties {
 				switch p.Key() {
 				case "test_multitype":
@@ -166,7 +169,7 @@ func TestBuilderPassBuild(t *testing.T) {
 						t.Errorf("fail to get Links type not link extra schema: Type Convert:%+v", v)
 						continue
 					}
-					if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
+					if i.ColumnName != "test multitype" || i.ColumnType != "int" {
 						t.Errorf("fail to get Properties type not link extra schema: Parse: %+v", i)
 					}
 
@@ -176,7 +179,7 @@ func TestBuilderPassBuild(t *testing.T) {
 						t.Errorf("fail to get Links type link extra schema: Type Convert:%+v", v)
 						continue
 					}
-					if i.ColumnName != "test multitype" || i.ColumnType != "int" || i.GoType != "int" {
+					if i.ColumnName != "test multitype" || i.ColumnType != "int" {
 						t.Errorf("fail to get Properties type link extra schema: Parse: %+v", i)
 					}
 				default:
