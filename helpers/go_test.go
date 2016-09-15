@@ -22,6 +22,29 @@ type TestCaseExtras struct {
 	Title            string
 }
 
+type TestCaseConvertArrayForGo struct {
+	Input  []string
+	Expect string
+	Title  string
+}
+
+func TestConvertArrayForGo(t *testing.T) {
+	tests := []TestCaseConvertArrayForGo{{
+		Input:  []string{"foo", "bar"},
+		Expect: "[]string{\"foo\",\"bar\"}",
+		Title:  "pass test",
+	}, {
+		Input:  []string{},
+		Expect: "[]string{}",
+		Title:  "empty test",
+	}}
+	for _, test := range tests {
+		if test.Expect != helpers.ConvertArrayForGo(test.Input) {
+			t.Errorf("fail to %s: Expect %s, But %s", test.Title, test.Expect, test.Input)
+		}
+	}
+}
+
 func TestConvertTagsForGo(t *testing.T) {
 	tests := []TestCaseConvertTagsForGo{{
 		ColumnName: "test_column",

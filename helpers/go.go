@@ -20,6 +20,19 @@ func ConvertTypeForGo(s string) string {
 	return conv[s]
 }
 
+func ConvertArrayForGo(m []string) string {
+	s := "[]string{"
+	for i, v := range m {
+		if i != len(m)-1 {
+			s += fmt.Sprintf("\"%s\",", v)
+		} else {
+			s += fmt.Sprintf("\"%s\"", v)
+		}
+	}
+	s += "}"
+	return s
+}
+
 func ConvertTagsForGo(n, cn string) string {
 	s := "`"
 	if n != "" {
