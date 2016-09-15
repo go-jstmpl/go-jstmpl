@@ -1,4 +1,4 @@
-package jstmpl
+package jstmpl_test
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/ghodss/yaml"
+	"github.com/go-jstmpl/go-jstmpl"
 	jstypes "github.com/go-jstmpl/go-jstmpl/types"
 	"github.com/lestrrat/go-jshschema"
 )
@@ -34,7 +35,7 @@ func TestBuilderLoopRef(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	b := NewBuilder()
+	b := jstmpl.NewBuilder()
 	_, err = b.Build(hs)
 	if err == nil {
 		t.Fatalf("build should be failed: %+v", b)
@@ -46,7 +47,7 @@ func TestBuillderNotHaveHref(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	b := NewBuilder()
+	b := jstmpl.NewBuilder()
 	ts, err := b.Build(hs)
 	if err != nil {
 		t.Fatalf("fail to build: %s", err)
@@ -62,7 +63,7 @@ func TestBuilderPassBuild(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	b := NewBuilder()
+	b := jstmpl.NewBuilder()
 	ts, err := b.Build(hs)
 	if err != nil {
 		t.Fatalf("fail to build: %s", err)
@@ -198,7 +199,7 @@ func TestBuilderConbinatrial(t *testing.T) {
 		t.Fatalf("fail to parse resolve: %v", err)
 	}
 
-	b := NewBuilder()
+	b := jstmpl.NewBuilder()
 	ts, err := b.Build(hs)
 	if err != nil {
 		t.Fatalf("fail to build: %s", err)
@@ -234,7 +235,7 @@ func TestResolvePass(t *testing.T) {
 		ctx.Key = k
 	}
 
-	scm, err := resolve(sc, hs.Schema, ctx)
+	scm, err := jstmpl.Resolve(sc, hs.Schema, ctx)
 	if err != nil {
 		t.Fatalf("fail to resolve: %s", err)
 	}

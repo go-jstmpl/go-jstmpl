@@ -1,9 +1,10 @@
-package jstmpl
+package jstmpl_test
 
 import (
 	"io"
 	"testing"
 
+	"github.com/go-jstmpl/go-jstmpl"
 	"github.com/go-jstmpl/go-jstmpl/types"
 )
 
@@ -15,7 +16,7 @@ type TestGenerateCase struct {
 }
 
 func TestGenerater(t *testing.T) {
-	gen := NewGenerator()
+	gen := jstmpl.NewGenerator()
 	tests := []TestGenerateCase{{
 		Template: []byte{},
 		Root:     &types.Root{},
