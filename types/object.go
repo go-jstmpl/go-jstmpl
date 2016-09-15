@@ -15,8 +15,9 @@ type Object struct {
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool                     `json:"-"`
-	Validations []validations.Validation 
+	IsPrivate   bool `json:"-"`
+	Required    []string
+	Validations []validations.Validation
 	Properties  []Schema
 }
 
@@ -34,6 +35,7 @@ func NewObject(ctx *Context, s *schema.Schema) *Object {
 		Type:       helpers.SpaceToUpperCamelCase(s.Title),
 		Name:       helpers.SpaceToUpperCamelCase(s.Title),
 		key:        ctx.Key,
+		Required:   ctx.Raw.Required,
 		IsPrivate:  false,
 		Properties: []Schema{},
 	}

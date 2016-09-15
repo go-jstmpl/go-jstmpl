@@ -65,7 +65,7 @@ links:
             name: fk
 
       test_multitype_link:
-        $ref: '#/definitions/test_multitype'   
+        $ref: '#/definitions/test_multitype'
 
     required:
       - test

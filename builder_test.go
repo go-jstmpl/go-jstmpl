@@ -158,6 +158,9 @@ func TestBuilderPassBuild(t *testing.T) {
 	for _, v := range ts.Links {
 		switch obj := v.Schema.(type) {
 		case *jstypes.Object:
+			if len(obj.Required) != 1 || obj.Required[0] != "test" {
+				t.Errorf("fail to get Required: %v", obj.Required)
+			}
 			for _, p := range obj.Properties {
 				switch p.Key() {
 				case "test_multitype":
