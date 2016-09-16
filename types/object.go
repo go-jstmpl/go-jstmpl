@@ -1,14 +1,16 @@
 package types
 
 import (
+	"encoding/json"
+
 	"github.com/go-jstmpl/go-jstmpl/helpers"
 	"github.com/go-jstmpl/go-jstmpl/validations"
 	"github.com/lestrrat/go-jsschema"
 )
 
 type Object struct {
-	Schema      *schema.Schema `json:"-"`
-	NativeType  string         `json:"-"`
+	*schema.Schema
+	NativeType  string `json:"-"`
 	TableName   string
 	ColumnName  string
 	ColumnType  string
@@ -39,6 +41,21 @@ func NewObject(ctx *Context, s *schema.Schema) *Object {
 		IsPrivate:  false,
 		Properties: []Schema{},
 	}
+}
+
+func (o Object) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"Title":       o.Title(),
+		"Description": o.Description,
+		"Type":        o.Type,
+		"Name":        o.Name,
+		"Required":    o.Required,
+		"Validations": o.Validations,
+		"Properties":  o.Properties,
+		"TableName":   o.TableName,
+		"ColumnName":  o.ColumnName,
+		"ColumnType":  o.ColumnType,
+	})
 }
 
 func (o Object) Raw() *schema.Schema {

@@ -1,21 +1,23 @@
 package types
 
 import (
+	"encoding/json"
+
 	"github.com/go-jstmpl/go-jstmpl/helpers"
 	"github.com/go-jstmpl/go-jstmpl/validations"
 	"github.com/lestrrat/go-jsschema"
 )
 
 type Integer struct {
-	Schema      *schema.Schema `json:"-"`
-	NativeType  string         `json:"-"`
+	*schema.Schema
+	NativeType  string `json:"-"`
 	ColumnName  string
 	ColumnType  string
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool                     `json:"-"`
-	Validations []validations.Validation 
+	IsPrivate   bool `json:"-"`
+	Validations []validations.Validation
 }
 
 func NewInteger(ctx *Context, s *schema.Schema) *Integer {
@@ -47,6 +49,20 @@ func NewInteger(ctx *Context, s *schema.Schema) *Integer {
 		IsPrivate:   true,
 		Validations: vs,
 	}
+}
+
+func (o Integer) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"Title":       o.Title(),
+		"Description": o.Description,
+		"Type":        o.Type,
+		"Name":        o.Name,
+		"Required":    o.Required,
+		"Validations": o.Validations,
+		"Properties":  o.Properties,
+		"ColumnName":  o.ColumnName,
+		"ColumnType":  o.ColumnType,
+	})
 }
 
 func (o Integer) Raw() *schema.Schema {
