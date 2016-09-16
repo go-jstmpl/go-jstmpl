@@ -1,21 +1,23 @@
 package types
 
 import (
+	"encoding/json"
+
 	"github.com/go-jstmpl/go-jstmpl/helpers"
 	"github.com/go-jstmpl/go-jstmpl/validations"
 	"github.com/lestrrat/go-jsschema"
 )
 
 type Boolean struct {
-	Schema      *schema.Schema `json:"-"`
-	NativeType  string         `json:"-"`
+	*schema.Schema
+	NativeType  string `json:"-"`
 	ColumnName  string
 	ColumnType  string
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool                     `json:"-"`
-	Validations []validations.Validation 
+	IsPrivate   bool `json:"-"`
+	Validations []validations.Validation
 }
 
 func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
@@ -39,6 +41,20 @@ func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 		IsPrivate:   true,
 		Validations: vs,
 	}
+}
+
+func (o Boolean) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"Title":       o.Title(),
+		"Description": o.Description,
+		"Type":        o.Type,
+		"Name":        o.Name,
+		"Required":    o.Required,
+		"Validations": o.Validations,
+		"Properties":  o.Properties,
+		"ColumnName":  o.ColumnName,
+		"ColumnType":  o.ColumnType,
+	})
 }
 
 func (o Boolean) Raw() *schema.Schema {

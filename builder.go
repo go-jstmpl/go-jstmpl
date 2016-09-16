@@ -1,8 +1,6 @@
 package jstmpl
 
 import (
-	"fmt"
-	"net/url"
 	"sort"
 
 	"github.com/go-jstmpl/go-jstmpl/types"
@@ -21,18 +19,8 @@ func NewBuilder() *Builder {
 func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 	var err error
 
-	m := &types.Root{
-		HyperSchema: hs,
-		Links:       make(types.LinkList, len(hs.Links)),
-	}
-	if hs.Schema.Extras["href"] != nil {
-		str := hs.Schema.Extras["href"].(string)
+	r, err := types.NewRoot(hs)
 
-		m.URL, err = url.Parse(str)
-		if err != nil {
-			return nil, err
-		}
-	}
 	ctx := &types.Context{
 		Validations: map[string]bool{},
 	}
@@ -82,32 +70,32 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 	sort.Sort(types.SchemasByKey(bs))
 	sort.Sort(types.SchemasByKey(ps))
 
-	m.Definitions = ds
-	m.Objects = make([]*types.Object, len(os))
+	r.Definitions = ds
+	r.Objects = make([]*types.Object, len(os))
 	for i, v := range os {
-		m.Objects[i] = v.(*types.Object)
+		r.Objects[i] = v.(*types.Object)
 	}
-	m.Arrays = make([]*types.Array, len(as))
+	r.Arrays = make([]*types.Array, len(as))
 	for i, v := range as {
-		m.Arrays[i] = v.(*types.Array)
+		r.Arrays[i] = v.(*types.Array)
 	}
-	m.Strings = make([]*types.String, len(ss))
+	r.Strings = make([]*types.String, len(ss))
 	for i, v := range ss {
-		m.Strings[i] = v.(*types.String)
+		r.Strings[i] = v.(*types.String)
 	}
-	m.Numbers = make([]*types.Number, len(ns))
+	r.Numbers = make([]*types.Number, len(ns))
 	for i, v := range ns {
-		m.Numbers[i] = v.(*types.Number)
+		r.Numbers[i] = v.(*types.Number)
 	}
-	m.Integers = make([]*types.Integer, len(is))
+	r.Integers = make([]*types.Integer, len(is))
 	for i, v := range is {
-		m.Integers[i] = v.(*types.Integer)
+		r.Integers[i] = v.(*types.Integer)
 	}
-	m.Booleans = make([]*types.Boolean, len(bs))
+	r.Booleans = make([]*types.Boolean, len(bs))
 	for i, v := range bs {
-		m.Booleans[i] = v.(*types.Boolean)
+		r.Booleans[i] = v.(*types.Boolean)
 	}
-	m.Properties = ps
+	r.Properties = ps
 
 	for i, l := range hs.Links {
 		var (
@@ -130,21 +118,17 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 			}
 		}
 
-		u, err := url.Parse(fmt.Sprintf("%s%s", m.URL.String(), l.Href))
+		rl, err := types.NewLink(l, s, ts, r)
 		if err != nil {
 			return nil, err
 		}
-		m.Links[i] = &types.Link{
-			Link:         *l,
-			URL:          u,
-			Schema:       s,
-			TargetSchema: ts,
-		}
+
+		r.Links[i] = rl
 	}
 
-	m.RequiredValidations = ctx.RequiredValidations()
+	r.RequiredValidations = ctx.RequiredValidations()
 
-	return m, nil
+	return r, nil
 }
 
 func Resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {
