@@ -30,6 +30,38 @@ func ParseHschema(file string) (*hschema.HyperSchema, error) {
 	return hs, nil
 }
 
+func TestBuilderParseQuery(t *testing.T) {
+	hs, err := ParseHschema("./test/query.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := jstmpl.NewBuilder()
+	ts, err := b.Build(hs)
+	if err != nil {
+		t.Fatalf("fail to build: %s", err)
+	}
+
+	fmt.Println(ts.QueryParameters, "query")
+	fmt.Println(ts.UrlParameters, "url")
+	if ts.QueryParameters == nil {
+		t.Fatal("fail to parse QueryParameters: %+v", ts)
+	}
+
+	if ts.QueryParameters["test_multitype"] != "integer" || ts.QueryParameters["test_integer"] != "integer" {
+		t.Errorf("fail to parse QueryParameters: Expect: test_multitype => integer, test_integer => integer, but %v",
+			ts.QueryParameters)
+	}
+
+	if ts.UrlParameters == nil {
+		t.Fatal("fail to parse UrlParameters: %+v", ts)
+	}
+
+	if ts.UrlParameters["test_integer"] != "integer" {
+		t.Errorf("fail to parse UrlParameters: Expect: test_integer => integer, but %v",
+			ts.QueryParameters)
+	}
+}
+
 func TestBuilderLoopRef(t *testing.T) {
 	hs, err := ParseHschema("./test/ref_loop.yml")
 	if err != nil {
