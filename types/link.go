@@ -98,6 +98,7 @@ func (o Link) MarshalJSON() ([]byte, error) {
 		"URL":          o.URL.String(),
 		"Schema":       o.Schema,
 		"TargetSchema": o.TargetSchema,
+		"Method":       o.Method,
 	})
 }
 
