@@ -157,6 +157,9 @@ func TestBuilderPassBuild(t *testing.T) {
 	}
 
 	for _, v := range ts.Links {
+		if v.Title != "Create test" {
+			t.Errorf("fail to get Title: expect Create test, but %s", v.Title)
+		}
 		if v.Method != "POST" {
 			t.Errorf("fail to get Method: expect POST, but %s", v.Method)
 		}

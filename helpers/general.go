@@ -19,6 +19,10 @@ func NotLast(i, len int) bool {
 	return i != len-1
 }
 
+func HandlerName(title, method string) string {
+	return method + SpaceToUpperCamelCase(title)
+}
+
 func SpaceToUpperCamelCase(s string) string {
 	if s == "" {
 		return ""

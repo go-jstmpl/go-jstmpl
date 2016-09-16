@@ -27,6 +27,7 @@ func (g *Generator) Process(out io.Writer, model *types.Root, tmpl []byte) error
 		"convertTypeForGo":      helpers.ConvertTypeForGo,
 		"convertTagsForGo":      helpers.ConvertTagsForGo,
 		"convertArrayForGo":     helpers.ConvertArrayForGo,
+		"handlerName":           helpers.HandlerName,
 	}).Parse(string(tmpl)))
 	if err := t.Execute(out, model); err != nil {
 		return err

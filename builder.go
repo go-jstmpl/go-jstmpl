@@ -137,6 +137,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 		m.Links[i] = &types.Link{
 			Link:         *l,
 			URL:          u,
+			Title:        l.Title,
 			Method:       l.Method,
 			Schema:       s,
 			TargetSchema: ts,

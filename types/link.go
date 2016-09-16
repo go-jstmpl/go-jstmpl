@@ -64,6 +64,7 @@ type LinkList []*Link
 type Link struct {
 	Link         hschema.Link `json:"-"`
 	URL          *url.URL
+	Title        string
 	Method       string
 	Schema       Schema
 	TargetSchema Schema
