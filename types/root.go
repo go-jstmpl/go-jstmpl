@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"net/url"
 
 	hschema "github.com/lestrrat/go-jshschema"
@@ -35,6 +36,22 @@ func NewRoot(hs *hschema.HyperSchema) (*Root, error) {
 		URL:         u,
 		Links:       make(LinkList, len(hs.Links)),
 	}, nil
+}
+
+func (r Root) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"URL":                 r.URL.String(),
+		"Links":               r.Links,
+		"Definitions":         r.Definitions,
+		"Properties":          r.Properties,
+		"Objects":             r.Objects,
+		"Arrays":              r.Arrays,
+		"Strings":             r.Strings,
+		"Numbers":             r.Numbers,
+		"Integers":            r.Integers,
+		"Booleans":            r.Booleans,
+		"RequiredValidations": r.RequiredValidations,
+	})
 }
 
 func (r Root) Title() string {
