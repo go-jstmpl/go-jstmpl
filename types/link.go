@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"sort"
 
@@ -62,10 +63,38 @@ var (
 type LinkList []*Link
 
 type Link struct {
-	Link         hschema.Link `json:"-"`
+	hschema.Link
+	Description  string
 	URL          *url.URL
 	Schema       Schema
 	TargetSchema Schema
+}
+
+func NewLink(l *hschema.Link, s, ts Schema, r *Root) (*Link, error) {
+	u, err := url.Parse(fmt.Sprintf("%s%s", r.URL.String(), l.Href))
+	if err != nil {
+		return nil, err
+	}
+	var d string
+	if l.Extras["description"] != nil {
+		d = l.Extras["description"].(string)
+	}
+	return &Link{
+		Link:         *l,
+		Description:  d,
+		Schema:       s,
+		TargetSchema: ts,
+		URL:          u,
+	}, nil
+}
+
+func (o Link) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"Title":        o.Title,
+		"URL":          o.URL.String(),
+		"Schema":       o.Schema,
+		"TargetSchema": o.TargetSchema,
+	})
 }
 
 type Header struct {

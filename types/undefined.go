@@ -14,7 +14,7 @@ type Undefined struct {
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool                     `json:"-"`
+	IsPrivate   bool `json:"-"`
 	Validations []validations.Validation
 }
 
@@ -47,6 +47,10 @@ func (o Undefined) Raw() *schema.Schema {
 
 func (o Undefined) Title() string {
 	return o.Schema.Title
+}
+
+func (o Undefined) Description() string {
+	return o.Schema.Description
 }
 
 func (o Undefined) Key() string {

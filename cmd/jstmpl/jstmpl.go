@@ -76,9 +76,9 @@ func _main() int {
 	}
 
 	if d := opts.DumpFile; d != "" {
-		b, err := yaml.Marshal(ts)
+		b, err := json.MarshalIndent(ts, "", "  ")
 		if err != nil {
-			log.Printf("fail to marshal Builder to YAML: %s", err)
+			log.Printf("fail to dump: %s", err)
 		}
 
 		switch d {

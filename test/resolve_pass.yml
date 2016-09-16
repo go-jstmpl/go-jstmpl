@@ -5,4 +5,3 @@ definitions:
     type: object
   test_link:
     $ref: "#/definitions/test"
-   
