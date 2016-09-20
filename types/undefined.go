@@ -57,10 +57,26 @@ func (o Undefined) Key() string {
 	return o.key
 }
 
-func (o Undefined) Example() interface{} {
-	e := o.Schema.Extras["example"]
-	if e != nil {
-		return e
+func (o Undefined) ReadOnly() bool {
+	v := o.Schema.Extras["readOnly"]
+	if v == nil {
+		return false
 	}
-	return ""
+	r, ok := v.(bool)
+	if !ok {
+		return false
+	}
+	return r
+}
+
+func (o Undefined) Example(withoutReadOnly bool) interface{} {
+	v := o.Schema.Extras["example"]
+	if v == nil {
+		return ""
+	}
+	return v
+}
+
+func (o Undefined) ExampleString() string {
+	return helpers.Serialize(o.Example(false))
 }

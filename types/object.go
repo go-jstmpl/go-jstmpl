@@ -74,10 +74,34 @@ func (o Object) Key() string {
 	return o.key
 }
 
-func (o Object) Example() interface{} {
+func (o Object) ReadOnly() bool {
+	v := o.Schema.Extras["readOnly"]
+	if v == nil {
+		return false
+	}
+	r, ok := v.(bool)
+	if !ok {
+		return false
+	}
+	return r
+}
+
+func (o Object) Example(withoutReadOnly bool) interface{} {
 	e := make(map[string]interface{})
+	if withoutReadOnly {
+		for _, s := range o.Properties {
+			if !s.ReadOnly() {
+				e[s.Key()] = s.Example(withoutReadOnly)
+			}
+		}
+		return e
+	}
 	for _, s := range o.Properties {
-		e[s.Key()] = s.Example()
+		e[s.Key()] = s.Example(withoutReadOnly)
 	}
 	return e
+}
+
+func (o Object) ExampleString() string {
+	return helpers.Serialize(o.Example(false))
 }

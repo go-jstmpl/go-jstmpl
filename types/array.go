@@ -78,10 +78,26 @@ func (o Array) Key() string {
 	return o.key
 }
 
-func (o Array) Example() interface{} {
+func (o Array) ReadOnly() bool {
+	v := o.Schema.Extras["readOnly"]
+	if v == nil {
+		return false
+	}
+	r, ok := v.(bool)
+	if !ok {
+		return false
+	}
+	return r
+}
+
+func (o Array) Example(withoutReadOnly bool) interface{} {
 	e := make([]interface{}, len(o.Items.Schemas))
 	for i, s := range o.Items.Schemas {
-		e[i] = s.Example()
+		e[i] = s.Example(withoutReadOnly)
 	}
 	return e
+}
+
+func (o Array) ExampleString() string {
+	return helpers.Serialize(o.Example(false))
 }

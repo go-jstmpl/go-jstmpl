@@ -1,0 +1,58 @@
+href: http://example.com/api/v1
+
+definitions:
+
+  post_id:
+    title: Post ID
+    description: ポストID
+    type: integer
+    example: 1
+    readOnly: true
+    unique: true
+  created_at:
+    title: Created at
+    description: レコード作成日時
+    type: string
+    example: 2016-05-09T19:45:32Z
+    readOnly: true
+    format: date-time
+  updated_at:
+    title: Updated at
+    description: レコード更新日時
+    type: string
+    example: 2016-05-10T13:53:08Z
+    readOnly: true
+    format: date-time
+  post_body:
+    title: Post body
+    description: ポスト本文
+    type: string
+    example: "body example"
+
+  post:
+    title: Post
+    description: ポスト
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/post_id'
+      created_at:
+        $ref: '#/definitions/created_at'
+      updated_at:
+        $ref: '#/definitions/updated_at'
+      body:
+        $ref: '#/definitions/post_body'
+    required:
+      - body
+
+links:
+
+- title: Create post
+  description: ポストを作成する
+  rel: create
+  href: /posts
+  method: POST
+  schema:
+    $ref: '#/definitions/post'
+  targetSchema:
+    $ref: '#/definitions/post'

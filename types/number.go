@@ -81,10 +81,26 @@ func (o Number) Key() string {
 	return o.key
 }
 
-func (o Number) Example() interface{} {
-	e := o.Schema.Extras["example"]
-	if e != nil {
-		return e
+func (o Number) ReadOnly() bool {
+	v := o.Schema.Extras["readOnly"]
+	if v == nil {
+		return false
 	}
-	return 0
+	r, ok := v.(bool)
+	if !ok {
+		return false
+	}
+	return r
+}
+
+func (o Number) Example(withoutReadOnly bool) interface{} {
+	v := o.Schema.Extras["example"]
+	if v == nil {
+		return 0
+	}
+	return v
+}
+
+func (o Number) ExampleString() string {
+	return helpers.Serialize(o.Example(false))
 }

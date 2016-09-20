@@ -127,7 +127,7 @@ func (l Link) ReqBody() string {
 		return ""
 	}
 
-	e := l.Schema.Example()
+	e := l.Schema.Example(true)
 	if e == nil {
 		return ""
 	}
@@ -162,7 +162,7 @@ func (l Link) ResBody() string {
 		return ""
 	}
 
-	e := l.TargetSchema.Example()
+	e := l.TargetSchema.Example(false)
 	if e == nil {
 		return ""
 	}
