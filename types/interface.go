@@ -5,7 +5,8 @@ import "github.com/lestrrat/go-jsschema"
 type Schema interface {
 	Title() string
 	Key() string
-	Example() interface{}
+	ReadOnly() bool
+	Example(withoutReadOnly bool) interface{}
 }
 
 type SchemasByKey []Schema

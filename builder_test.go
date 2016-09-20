@@ -244,3 +244,31 @@ func TestResolvePass(t *testing.T) {
 		t.Errorf("fail to resolve link schema: title should be test: %+v", scm)
 	}
 }
+
+func TestExample(t *testing.T) {
+	hs, err := ParseHschema("./test/example.yml")
+	if err != nil {
+		t.Fatalf("fail to parse resolve: %v", err)
+	}
+	b := jstmpl.NewBuilder()
+	s, err := b.Build(hs)
+	if err != nil {
+		t.Fatalf("fail to build: %+v", err)
+	}
+
+	l := s.Links[0]
+
+	if l.ReqBody() != `{
+  "body": "body example"
+}` {
+		t.Errorf("fail to ReqBody")
+	}
+	if l.ResBody() != `{
+  "body": "body example",
+  "created_at": "2016-05-09T19:45:32Z",
+  "id": 1,
+  "updated_at": "2016-05-10T13:53:08Z"
+}` {
+		t.Errorf("fail to ResBody")
+	}
+}
