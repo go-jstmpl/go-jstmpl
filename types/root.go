@@ -20,8 +20,6 @@ type Root struct {
 	Integers            []*Integer
 	Booleans            []*Boolean
 	RequiredValidations []string
-	QueryParameters     map[string]string
-	UrlParameters       map[string]string
 }
 
 func NewRoot(hs *hschema.HyperSchema) (*Root, error) {
@@ -52,8 +50,6 @@ func (r Root) MarshalJSON() ([]byte, error) {
 		"Numbers":             r.Numbers,
 		"Integers":            r.Integers,
 		"Booleans":            r.Booleans,
-		"QueryParameters":     r.QueryParameters,
-		"UrlParameters":       r.UrlParameters,
 		"RequiredValidations": r.RequiredValidations,
 	})
 }

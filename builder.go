@@ -95,36 +95,25 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 	for i, v := range bs {
 		r.Booleans[i] = v.(*types.Boolean)
 	}
+
 	r.Properties = ps
 
-	qp := map[string]string{}
-	up := map[string]string{}
 	for i, l := range hs.Links {
 		var (
 			s, ts types.Schema
+			us    []types.Schema
 		)
 		m, err := GetUrlParameters(l.Href, hs.Schema, ctx)
 		if err != nil {
 			return nil, err
 		}
-		for k, v := range m {
-			up[k] = v
-		}
+		us = append(us, m...)
 
 		if l.Schema != nil {
 			ctx.Key = ""
 			s, err = Resolve(l.Schema, hs.Schema, ctx)
 			if err != nil {
 				return nil, err
-			}
-			if l.Method == "GET" {
-				m, err := ParseParameter(s)
-				if err != nil {
-					return nil, fmt.Errorf("fail to parse query: %s", err)
-				}
-				for k, v := range m {
-					qp[k] = v
-				}
 			}
 		}
 
@@ -136,25 +125,24 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 			}
 		}
 
-		rl, err := types.NewLink(l, s, ts, r)
+		rl, err := types.NewLink(l, s, ts, r, us)
 		if err != nil {
 			return nil, err
 		}
 		r.Links[i] = rl
+
 	}
-	r.QueryParameters = qp
-	r.UrlParameters = up
+
 	r.RequiredValidations = ctx.RequiredValidations()
 	return r, nil
 }
 
 // GetUrlParameters is resolve a JSON Schema from JSON Path and
 // catch properties. for example
-// if path = '/path/to/resources/{#/definitions/resource}', and
-// resource's definition is {Title: "resources", PrimitiveType: "integer"}, then
-// return {"resources" => "integer"}
-func GetUrlParameters(h string, t *schema.Schema, ctx *types.Context) (map[string]string, error) {
-	m := map[string]string{}
+// if path = '/path/to/resources/{#/definitions/resource}', then
+// getting specified schema
+func GetUrlParameters(h string, t *schema.Schema, ctx *types.Context) ([]types.Schema, error) {
+	var m []types.Schema
 	var i, j int
 	b := false
 	// parse {...} type string
@@ -168,79 +156,15 @@ func GetUrlParameters(h string, t *schema.Schema, ctx *types.Context) (map[strin
 			}
 			s := schema.New()
 			s.Reference = h[i:j]
-			sch, err := Resolve(s, t, ctx)
+			scm, err := Resolve(s, t, ctx)
 			if err != nil {
 				return nil, fmt.Errorf("fail to parse url parameter: resolve: %+v", s)
 			}
-			q, err := ParseParameter(sch)
-			if err != nil {
-				return nil, fmt.Errorf("fail to parse url parameter: parse: %+v", sch)
-			}
-			for k, v := range q {
-				m[k] = v
-			}
+			m = append(m, scm)
 			b = false
 		}
 	}
 	return m, nil
-}
-
-func ParseParameter(s types.Schema) (map[string]string, error) {
-	q := map[string]string{}
-	switch r := s.(type) {
-	case *types.String:
-		if r.Title() == "" {
-			return nil, fmt.Errorf("title is empty: %+v", s)
-		}
-		q[r.Title()] = "string"
-	case *types.Number:
-		if r.Title() == "" {
-			return nil, fmt.Errorf("title is empty: %+v", s)
-		}
-		q[r.Title()] = "number"
-	case *types.Integer:
-		if r.Title() == "" {
-			return nil, fmt.Errorf("title is empty: %+v", s)
-		}
-		q[r.Title()] = "integer"
-	case *types.Boolean:
-		if r.Title() == "" {
-			return nil, fmt.Errorf("title is empty: %+v", s)
-		}
-		q[r.Title()] = "boolean"
-	case *types.Object:
-		for _, p := range r.Properties {
-			switch pp := p.(type) {
-			case *types.String:
-				if pp.Title() == "" {
-					return nil, fmt.Errorf("title is empty: %+v", s)
-				}
-				q[pp.Title()] = "string"
-			case *types.Number:
-				if pp.Title() == "" {
-					return nil, fmt.Errorf("title is empty: %+v", s)
-				}
-				q[pp.Title()] = "number"
-			case *types.Integer:
-				if pp.Title() == "" {
-					return nil, fmt.Errorf("title is empty: %+v", s)
-				}
-				q[pp.Title()] = "integer"
-			case *types.Boolean:
-				if pp.Title() == "" {
-					return nil, fmt.Errorf("title is empty: %+v", s)
-				}
-				q[pp.Title()] = "boolean"
-			default:
-				return nil, fmt.Errorf("fail type convert: %+vs is %T type", s, s)
-
-			}
-		}
-	default:
-		return nil, fmt.Errorf("fail type convert: %+vs is %T type", s, s)
-	}
-
-	return q, nil
 }
 
 func Resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {

@@ -41,24 +41,24 @@ func TestBuilderParseQuery(t *testing.T) {
 		t.Fatalf("fail to build: %s", err)
 	}
 
-	fmt.Println(ts.QueryParameters, "query")
-	fmt.Println(ts.UrlParameters, "url")
-	if ts.QueryParameters == nil {
-		t.Fatal("fail to parse QueryParameters: %+v", ts)
-	}
-
-	if ts.QueryParameters["test_multitype"] != "integer" || ts.QueryParameters["test_integer"] != "integer" {
-		t.Errorf("fail to parse QueryParameters: Expect: test_multitype => integer, test_integer => integer, but %v",
-			ts.QueryParameters)
-	}
-
-	if ts.UrlParameters == nil {
-		t.Fatal("fail to parse UrlParameters: %+v", ts)
-	}
-
-	if ts.UrlParameters["test_integer"] != "integer" {
-		t.Errorf("fail to parse UrlParameters: Expect: test_integer => integer, but %v",
-			ts.QueryParameters)
+	for _, l := range ts.Links {
+		if l.UrlParameters == nil || len(l.UrlParameters) != 2 {
+			t.Fatal("fail to parse UrlParameters: %+v", ts)
+		}
+		for _, p := range l.UrlParameters {
+			switch pp := p.(type) {
+			case *jstypes.Integer:
+				if pp.Title() != "test integer" {
+					t.Errorf("fail to resolve UrlParameters: title: Expect: test integer, Actual: %+v", pp.Title())
+				}
+			case *jstypes.Boolean:
+				if pp.Title() != "test bool" {
+					t.Errorf("fail to resolve UrlParameters: title: Expect: test bool, Actual: %+v", pp.Title())
+				}
+			default:
+				t.Errorf("fail to resolve UrlParameters: unknown type: %+v", pp)
+			}
+		}
 	}
 }
 
