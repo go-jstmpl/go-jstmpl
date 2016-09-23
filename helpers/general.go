@@ -19,6 +19,11 @@ func NotLast(i, len int) bool {
 	return i != len-1
 }
 
+func GetKeyFromJSONPath(url string) string {
+	s := strings.Split(url, "/")
+	return SnakeToUpperCamelCase(s[len(s)-1])
+}
+
 func EscapeJSONPath(url string) string {
 	var escape string
 	var i int

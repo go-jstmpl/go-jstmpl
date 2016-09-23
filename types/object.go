@@ -19,6 +19,7 @@ type Object struct {
 	key         string
 	IsPrivate   bool `json:"-"`
 	Required    []string
+	Reference   string
 	Validations []validations.Validation
 	Properties  []Schema
 }
@@ -39,6 +40,7 @@ func NewObject(ctx *Context, s *schema.Schema) *Object {
 		key:        ctx.Key,
 		Required:   ctx.Raw.Required,
 		IsPrivate:  false,
+		Reference:  ctx.Raw.Reference,
 		Properties: []Schema{},
 	}
 }
@@ -55,6 +57,7 @@ func (o Object) MarshalJSON() ([]byte, error) {
 		"TableName":   o.TableName,
 		"ColumnName":  o.ColumnName,
 		"ColumnType":  o.ColumnType,
+		"Reference":   o.Reference,
 	})
 }
 

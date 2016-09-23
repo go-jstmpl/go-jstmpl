@@ -18,6 +18,7 @@ type Array struct {
 	key         string
 	IsPrivate   bool
 	Properties  []Schema
+	Reference   string
 	Validations []validations.Validation
 	Item        Schema
 	Items       *ItemSpec
@@ -37,6 +38,7 @@ func NewArray(ctx *Context, s *schema.Schema) *Array {
 		NativeType: "array",
 		ColumnName: cn,
 		ColumnType: ct,
+		Reference:  ctx.Raw.Reference,
 		Type:       helpers.SpaceToUpperCamelCase(s.Title),
 		Name:       helpers.SpaceToUpperCamelCase(s.Title),
 		key:        ctx.Key,
@@ -59,6 +61,7 @@ func (o Array) MarshalJSON() ([]byte, error) {
 		"Properties":  o.Properties,
 		"ColumnName":  o.ColumnName,
 		"ColumnType":  o.ColumnType,
+		"Reference":   o.Reference,
 	})
 }
 
