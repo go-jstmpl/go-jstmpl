@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"sort"
 
+	"github.com/go-jstmpl/go-jstmpl/helpers"
 	hschema "github.com/lestrrat/go-jshschema"
 )
 
@@ -66,6 +67,7 @@ type Link struct {
 	hschema.Link
 	Description   string
 	URL           *url.URL
+	RouterHref    string
 	Title         string
 	Method        string
 	UrlParameters []Schema
@@ -88,6 +90,7 @@ func NewLink(l *hschema.Link, s, ts Schema, r *Root, us []Schema) (*Link, error)
 		Schema:        s,
 		TargetSchema:  ts,
 		URL:           u,
+		RouterHref:    helpers.EscapeJSONPath(l.Href),
 		UrlParameters: us,
 		Title:         l.Title,
 		Method:        l.Method,
@@ -102,6 +105,7 @@ func (o Link) MarshalJSON() ([]byte, error) {
 		"TargetSchema": o.TargetSchema,
 		"Method":       o.Method,
 		"UrlParameter": o.UrlParameters,
+		"RouterHref":   o.RouterHref,
 	})
 }
 
