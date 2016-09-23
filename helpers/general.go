@@ -19,8 +19,34 @@ func NotLast(i, len int) bool {
 	return i != len-1
 }
 
-func HandlerName(title, method string) string {
-	return method + SpaceToUpperCamelCase(title)
+func EscapeJSONPath(url string) string {
+	var escape string
+	var i int
+	b := false
+
+	for idx, v := range url {
+		switch string(v) {
+		case "{":
+			escape += ":"
+			i = idx + 1
+			b = true
+		case "}":
+			if b {
+				p := strings.Split(url[i:idx], "/")
+				escape += p[len(p)-1]
+			}
+			b = false
+		default:
+			if !b {
+				escape += string(v)
+			}
+		}
+	}
+	return escape
+}
+
+func LinkTitle(title, method, suffix string) string {
+	return method + SpaceToUpperCamelCase(title) + suffix
 }
 
 func SpaceToUpperCamelCase(s string) string {

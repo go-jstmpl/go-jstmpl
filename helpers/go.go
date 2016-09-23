@@ -13,8 +13,6 @@ func ConvertTypeForGo(s string) string {
 		"boolean": "dbr.NullBool",
 		"number":  "dbr.NullFloat64",
 		"string":  "dbr.NullString",
-		"object":  "object",
-		"array":   "array",
 	}
 
 	return conv[s]
@@ -35,7 +33,7 @@ func ConvertArrayForGo(m []string) string {
 
 func ConvertTagsForGo(n, cn string) string {
 	s := "`"
-	if n != "" {
+	if n != "-" {
 		s += fmt.Sprintf("json:\"%s, omitempty\" ", n)
 	} else {
 		s += fmt.Sprint("json:\"-\" ")

@@ -58,12 +58,12 @@ func TestConvertTagsForGo(t *testing.T) {
 		Title:      "pass ColumnName column empty test",
 	}, {
 		ColumnName: "test_column",
-		Name:       "",
+		Name:       "-",
 		Expect:     "`json:\"-\" xorm:\"test_column\"`",
 		Title:      "pass Name column empty test",
 	}, {
 		ColumnName: "",
-		Name:       "",
+		Name:       "-",
 		Expect:     "`json:\"-\" xorm:\"-\"`",
 		Title:      "pass all column empty test",
 	}}
