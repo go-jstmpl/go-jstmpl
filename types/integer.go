@@ -40,8 +40,8 @@ func NewInteger(ctx *Context, s *schema.Schema) *Integer {
 
 	return &Integer{
 		Schema:      s,
-		NativeType:  "number",
-		Type:        "number",
+		NativeType:  "integer",
+		Type:        "integer",
 		ColumnName:  cn,
 		ColumnType:  ct,
 		Name:        helpers.SpaceToUpperCamelCase(s.Title),
