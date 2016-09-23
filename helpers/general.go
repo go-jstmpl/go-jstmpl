@@ -19,6 +19,15 @@ func NotLast(i, len int) bool {
 	return i != len-1
 }
 
+func GetKeyFromJSONPath(url string) string {
+	s := strings.Split(url, "/")
+	return SnakeToUpperCamelCase(s[len(s)-1])
+}
+
+func LinkTitle(title, method, suffix string) string {
+	return method + SpaceToUpperCamelCase(title) + suffix
+}
+
 func SpaceToUpperCamelCase(s string) string {
 	if s == "" {
 		return ""

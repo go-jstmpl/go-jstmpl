@@ -17,8 +17,9 @@ type Object struct {
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool `json:"-"`
+	Private     bool `json:"-"`
 	Required    []string
+	Reference   string
 	Validations []validations.Validation
 	Properties  []Schema
 }
@@ -26,9 +27,9 @@ type Object struct {
 func NewObject(ctx *Context, s *schema.Schema) *Object {
 	var tn string
 	if s.Extras["table"] != nil {
-		tn, _ = helpers.GetTableData(s)
+		tn, _ = helpers.GetTable(s)
 	} else {
-		tn, _ = helpers.GetTableData(ctx.Raw)
+		tn, _ = helpers.GetTable(ctx.Raw)
 	}
 	return &Object{
 		Schema:     s,
@@ -38,7 +39,8 @@ func NewObject(ctx *Context, s *schema.Schema) *Object {
 		Name:       helpers.SpaceToUpperCamelCase(s.Title),
 		key:        ctx.Key,
 		Required:   ctx.Raw.Required,
-		IsPrivate:  false,
+		Private:  false,
+		Reference:  ctx.Raw.Reference,
 		Properties: []Schema{},
 	}
 }
@@ -55,6 +57,7 @@ func (o Object) MarshalJSON() ([]byte, error) {
 		"TableName":   o.TableName,
 		"ColumnName":  o.ColumnName,
 		"ColumnType":  o.ColumnType,
+		"Reference":   o.Reference,
 	})
 }
 

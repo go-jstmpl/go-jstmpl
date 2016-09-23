@@ -15,11 +15,35 @@ type TestCaseConvertTagsForGo struct {
 }
 
 type TestCaseExtras struct {
-	Extras           map[string]interface{}
-	ExpectColumnName string
-	ExpectTableName  string
-	ExpectDbType     string
-	Title            string
+	Extras             map[string]interface{}
+	ExpectColumnName   string
+	ExpectTableName    string
+	ExpectDbType       string
+	ExpectPrivateState bool
+	Title              string
+}
+
+type TestCaseConvertArrayForGo struct {
+	Input  []string
+	Expect string
+	Title  string
+}
+
+func TestConvertArrayForGo(t *testing.T) {
+	tests := []TestCaseConvertArrayForGo{{
+		Input:  []string{"foo", "bar"},
+		Expect: "[]string{\"foo\",\"bar\"}",
+		Title:  "pass test",
+	}, {
+		Input:  []string{},
+		Expect: "[]string{}",
+		Title:  "empty test",
+	}}
+	for _, test := range tests {
+		if test.Expect != helpers.ConvertArrayForGo(test.Input) {
+			t.Errorf("fail to %s: Expect %s, But %s", test.Title, test.Expect, test.Input)
+		}
+	}
 }
 
 func TestConvertTagsForGo(t *testing.T) {
@@ -35,12 +59,12 @@ func TestConvertTagsForGo(t *testing.T) {
 		Title:      "pass ColumnName column empty test",
 	}, {
 		ColumnName: "test_column",
-		Name:       "",
+		Name:       "-",
 		Expect:     "`json:\"-\" xorm:\"test_column\"`",
 		Title:      "pass Name column empty test",
 	}, {
 		ColumnName: "",
-		Name:       "",
+		Name:       "-",
 		Expect:     "`json:\"-\" xorm:\"-\"`",
 		Title:      "pass all column empty test",
 	}}
@@ -88,12 +112,12 @@ func TestGetExtraData(t *testing.T) {
 		s := schema.New()
 		s.Extras = test.Extras
 
-		cn, ct, err := helpers.GetColumnData(s)
+		cn, ct, err := helpers.GetColumn(s)
 		if err != nil {
 			t.Errorf("%s: in GetColumnData, Extras: %s, Error: %s", test.Title, test.Extras, err)
 		}
 
-		tn, err := helpers.GetTableData(s)
+		tn, err := helpers.GetTable(s)
 		if err != nil {
 			t.Errorf("%s: in GetTableData, Extras: %s, Error: %s", test.Title, test.Extras, err)
 		}

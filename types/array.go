@@ -16,8 +16,9 @@ type Array struct {
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool
+	Private     bool
 	Properties  []Schema
+	Reference   string
 	Validations []validations.Validation
 	Item        Schema
 	Items       *ItemSpec
@@ -27,9 +28,9 @@ func NewArray(ctx *Context, s *schema.Schema) *Array {
 	var cn, ct string
 
 	if s.Extras["column"] != nil {
-		cn, ct, _ = helpers.GetColumnData(s)
+		cn, ct, _ = helpers.GetColumn(s)
 	} else {
-		cn, ct, _ = helpers.GetColumnData(ctx.Raw)
+		cn, ct, _ = helpers.GetColumn(ctx.Raw)
 	}
 
 	return &Array{
@@ -37,10 +38,11 @@ func NewArray(ctx *Context, s *schema.Schema) *Array {
 		NativeType: "array",
 		ColumnName: cn,
 		ColumnType: ct,
+		Reference:  ctx.Raw.Reference,
 		Type:       helpers.SpaceToUpperCamelCase(s.Title),
 		Name:       helpers.SpaceToUpperCamelCase(s.Title),
 		key:        ctx.Key,
-		IsPrivate:  false,
+		Private:    false,
 		Items: &ItemSpec{
 			ItemSpec: s.Items,
 			Schemas:  make([]Schema, len(s.Items.Schemas)),
@@ -59,6 +61,7 @@ func (o Array) MarshalJSON() ([]byte, error) {
 		"Properties":  o.Properties,
 		"ColumnName":  o.ColumnName,
 		"ColumnType":  o.ColumnType,
+		"Reference":   o.Reference,
 	})
 }
 

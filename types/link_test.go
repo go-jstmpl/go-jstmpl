@@ -23,6 +23,7 @@ func TestNewLink(t *testing.T) {
 		types.Object{},
 		types.Object{},
 		&types.Root{URL: u},
+		[]types.Schema{},
 	)
 	if err != nil {
 		t.Fatalf("fail to NewLink %s", err)
@@ -40,6 +41,7 @@ func TestNewLinkWithoutDescription(t *testing.T) {
 	if err != nil {
 		t.Fatalf("fail to parse URL %s", err)
 	}
+
 	l, err := types.NewLink(
 		&hschema.Link{
 			Title:  "title",
@@ -48,7 +50,9 @@ func TestNewLinkWithoutDescription(t *testing.T) {
 		types.Object{},
 		types.Object{},
 		&types.Root{URL: u},
+		[]types.Schema{},
 	)
+
 	if err != nil {
 		t.Fatalf("fail to NewLink %s", err)
 	}

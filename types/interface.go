@@ -1,6 +1,8 @@
 package types
 
-import "github.com/lestrrat/go-jsschema"
+import (
+	"github.com/lestrrat/go-jsschema"
+)
 
 type Schema interface {
 	Title() string

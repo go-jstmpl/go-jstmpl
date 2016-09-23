@@ -30,6 +30,41 @@ func ParseHschema(file string) (*hschema.HyperSchema, error) {
 	return hs, nil
 }
 
+func TestBuilderParseQuery(t *testing.T) {
+	hs, err := ParseHschema("./test/query.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := jstmpl.NewBuilder()
+	ts, err := b.Build(hs)
+	if err != nil {
+		t.Fatalf("fail to build: %s", err)
+	}
+
+	for _, l := range ts.Links {
+		if l.UrlParameters == nil || len(l.UrlParameters) != 2 {
+			t.Fatal("fail to parse UrlParameters: %+v", ts)
+		}
+		if l.RouterHref != "/query/:test_integer/:test_boolean" {
+			t.Errorf("fail to Parse References: Href Expect: /query/:test_integer/:test_boolean, Actual: %s", l.RouterHref)
+		}
+		for _, p := range l.UrlParameters {
+			switch pp := p.(type) {
+			case *jstypes.Integer:
+				if pp.Title() != "test integer" {
+					t.Errorf("fail to resolve UrlParameters: title: Expect: test integer, Actual: %+v", pp.Title())
+				}
+			case *jstypes.Boolean:
+				if pp.Title() != "test bool" {
+					t.Errorf("fail to resolve UrlParameters: title: Expect: test bool, Actual: %+v", pp.Title())
+				}
+			default:
+				t.Errorf("fail to resolve UrlParameters: unknown type: %+v", pp)
+			}
+		}
+	}
+}
+
 func TestBuilderLoopRef(t *testing.T) {
 	hs, err := ParseHschema("./test/ref_loop.yml")
 	if err != nil {
@@ -157,6 +192,12 @@ func TestBuilderPassBuild(t *testing.T) {
 	}
 
 	for _, v := range ts.Links {
+		if v.Title != "Create test" {
+			t.Errorf("fail to get Title: expect Create test, but %s", v.Title)
+		}
+		if v.Method != "POST" {
+			t.Errorf("fail to get Method: expect POST, but %s", v.Method)
+		}
 		switch obj := v.Schema.(type) {
 		case *jstypes.Object:
 			if len(obj.Required) != 1 || obj.Required[0] != "test" {

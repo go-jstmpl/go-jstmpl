@@ -1,0 +1,29 @@
+title: query
+definitions:
+  test_integer:
+    title: test integer
+    type: integer
+  
+  test_boolean:
+    title: test bool
+    type: boolean
+
+  test_object:
+    title: test object
+    type: object
+    properties:
+        foo:
+            $ref: '#/definitions/test_integer'
+
+href: https://builder.com
+links:
+- title: Query
+  rel: create
+  href: /query/{#/definitions/test_integer}/{#/definitions/test_boolean}
+  method: GET
+  schema:
+    title: schema
+    type: object
+    properties:
+      test_multitype_link:
+        $ref: '#/definitions/test_integer'

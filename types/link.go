@@ -64,13 +64,17 @@ type LinkList []*Link
 
 type Link struct {
 	hschema.Link
-	Description  string
-	URL          *url.URL
-	Schema       Schema
-	TargetSchema Schema
+	Description   string
+	URL           *url.URL
+	RouterHref    string
+	Title         string
+	Method        string
+	UrlParameters []Schema
+	Schema        Schema
+	TargetSchema  Schema
 }
 
-func NewLink(l *hschema.Link, s, ts Schema, r *Root) (*Link, error) {
+func NewLink(l *hschema.Link, s, ts Schema, r *Root, us []Schema) (*Link, error) {
 	u, err := url.Parse(fmt.Sprintf("%s%s", r.URL.String(), l.Href))
 	if err != nil {
 		return nil, err
@@ -80,11 +84,14 @@ func NewLink(l *hschema.Link, s, ts Schema, r *Root) (*Link, error) {
 		d = l.Extras["description"].(string)
 	}
 	return &Link{
-		Link:         *l,
-		Description:  d,
-		Schema:       s,
-		TargetSchema: ts,
-		URL:          u,
+		Link:          *l,
+		Description:   d,
+		Schema:        s,
+		TargetSchema:  ts,
+		URL:           u,
+		UrlParameters: us,
+		Title:         l.Title,
+		Method:        l.Method,
 	}, nil
 }
 
@@ -94,6 +101,9 @@ func (o Link) MarshalJSON() ([]byte, error) {
 		"URL":          o.URL.String(),
 		"Schema":       o.Schema,
 		"TargetSchema": o.TargetSchema,
+		"Method":       o.Method,
+		"UrlParameter": o.UrlParameters,
+		"RouterHref":   o.RouterHref,
 	})
 }
 

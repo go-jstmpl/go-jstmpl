@@ -13,16 +13,27 @@ func ConvertTypeForGo(s string) string {
 		"boolean": "dbr.NullBool",
 		"number":  "dbr.NullFloat64",
 		"string":  "dbr.NullString",
-		"object":  "object",
-		"array":   "array",
 	}
 
 	return conv[s]
 }
 
+func ConvertArrayForGo(m []string) string {
+	s := "[]string{"
+	for i, v := range m {
+		if i != len(m)-1 {
+			s += fmt.Sprintf("\"%s\",", v)
+		} else {
+			s += fmt.Sprintf("\"%s\"", v)
+		}
+	}
+	s += "}"
+	return s
+}
+
 func ConvertTagsForGo(n, cn string) string {
 	s := "`"
-	if n != "" {
+	if n != "-" {
 		s += fmt.Sprintf("json:\"%s, omitempty\" ", n)
 	} else {
 		s += fmt.Sprint("json:\"-\" ")
@@ -37,7 +48,7 @@ func ConvertTagsForGo(n, cn string) string {
 	return s
 }
 
-func GetTableData(ts *schema.Schema) (tn string, err error) {
+func GetTable(ts *schema.Schema) (tn string, err error) {
 	if ts.Extras["table"] == nil {
 		return
 	}
@@ -56,7 +67,19 @@ func GetTableData(ts *schema.Schema) (tn string, err error) {
 	return
 }
 
-func GetColumnData(ts *schema.Schema) (cn, ct string, err error) {
+func GetPrivate(ts *schema.Schema) (bool, error) {
+	if ts.Extras["private"] == nil {
+		return false, nil
+	}
+
+	c, ok := ts.Extras["private"].(bool)
+	if !ok {
+		return false, fmt.Errorf("private %v is invalid type", ts.Extras["private"])
+	}
+	return c, nil
+}
+
+func GetColumn(ts *schema.Schema) (cn, ct string, err error) {
 	if ts.Extras["column"] == nil {
 		return
 	}

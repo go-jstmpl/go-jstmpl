@@ -1,7 +1,9 @@
 package jstmpl
 
 import (
+	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/go-jstmpl/go-jstmpl/types"
 	"github.com/lestrrat/go-jshschema"
@@ -17,14 +19,13 @@ func NewBuilder() *Builder {
 }
 
 func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
-	var err error
-
 	r, err := types.NewRoot(hs)
-
+	if err != nil {
+		return nil, err
+	}
 	ctx := &types.Context{
 		Validations: map[string]bool{},
 	}
-
 	var ds, os, as, ss, ns, is, bs, ps []types.Schema
 
 	for k, s := range hs.Definitions {
@@ -95,12 +96,19 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 	for i, v := range bs {
 		r.Booleans[i] = v.(*types.Boolean)
 	}
+
 	r.Properties = ps
 
 	for i, l := range hs.Links {
 		var (
 			s, ts types.Schema
+			us    []types.Schema
 		)
+		m, href, err := ParseUrlParameters(l.Href, hs.Schema, ctx)
+		if err != nil {
+			return nil, err
+		}
+		us = append(us, m...)
 
 		if l.Schema != nil {
 			ctx.Key = ""
@@ -118,17 +126,58 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 			}
 		}
 
-		rl, err := types.NewLink(l, s, ts, r)
+		rl, err := types.NewLink(l, s, ts, r, us)
 		if err != nil {
 			return nil, err
 		}
-
+		rl.RouterHref = href
 		r.Links[i] = rl
+
 	}
 
 	r.RequiredValidations = ctx.RequiredValidations()
-
 	return r, nil
+}
+
+// GetUrlParameters is resolve a JSON Schema from JSON Path and
+// catch properties. for example
+// if path = '/path/to/resources/{#/definitions/resource}', then
+// getting specified schema
+func ParseUrlParameters(h string, t *schema.Schema, ctx *types.Context) ([]types.Schema, string, error) {
+	var m []types.Schema
+	var path string
+	var i, j int
+	b := false
+	// parse {...} type string
+	for j = 0; j < len(h); j++ {
+		switch h[j : j+1] {
+		case "{":
+			i, b = j, true
+			path += ":"
+		case "}":
+			if !b {
+				return nil, path, fmt.Errorf("fail to parse url parameter: invalid URL: %+v", h)
+			}
+			// resolve schema
+			s := schema.New()
+			s.Reference = h[i:j]
+			scm, err := Resolve(s, t, ctx)
+			if err != nil {
+				return nil, path, fmt.Errorf("fail to parse url parameter: resolve: %+v", s)
+			}
+			m = append(m, scm)
+
+			// replace JSON Path to :hoge style
+			p := strings.Split(s.Reference, "/")
+			path += p[len(p)-1]
+			b = false
+		default:
+			if !b {
+				path += h[j : j+1]
+			}
+		}
+	}
+	return m, path, nil
 }
 
 func Resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {

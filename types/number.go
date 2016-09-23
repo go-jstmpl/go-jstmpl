@@ -16,7 +16,7 @@ type Number struct {
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool `json:"-"`
+	Private     bool
 	Validations []validations.Validation
 }
 
@@ -33,9 +33,16 @@ func NewNumber(ctx *Context, s *schema.Schema) *Number {
 	var cn, ct string
 
 	if s.Extras["column"] != nil {
-		cn, ct, _ = helpers.GetColumnData(s)
+		cn, ct, _ = helpers.GetColumn(s)
 	} else {
-		cn, ct, _ = helpers.GetColumnData(ctx.Raw)
+		cn, ct, _ = helpers.GetColumn(ctx.Raw)
+	}
+
+	var pr bool
+	if s.Extras["IsPrivate"] != nil {
+		pr, _ = helpers.GetPrivate(s)
+	} else {
+		pr, _ = helpers.GetPrivate(ctx.Raw)
 	}
 
 	return &Number{
@@ -46,7 +53,7 @@ func NewNumber(ctx *Context, s *schema.Schema) *Number {
 		ColumnType:  ct,
 		Name:        helpers.SpaceToUpperCamelCase(s.Title),
 		key:         ctx.Key,
-		IsPrivate:   true,
+		Private:     pr,
 		Validations: vs,
 	}
 }
