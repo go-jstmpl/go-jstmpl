@@ -25,8 +25,14 @@ type Array struct {
 }
 
 func NewArray(ctx *Context, s *schema.Schema) *Array {
-	var cn, ct string
+	var pr bool
+	if s.Extras["private"] != nil {
+		pr, _ = helpers.GetPrivate(s)
+	} else {
+		pr, _ = helpers.GetPrivate(ctx.Raw)
+	}
 
+	var cn, ct string
 	if s.Extras["column"] != nil {
 		cn, ct, _ = helpers.GetColumn(s)
 	} else {
@@ -42,7 +48,7 @@ func NewArray(ctx *Context, s *schema.Schema) *Array {
 		Type:       helpers.SpaceToUpperCamelCase(s.Title),
 		Name:       helpers.SpaceToUpperCamelCase(s.Title),
 		key:        ctx.Key,
-		Private:    false,
+		Private:    pr,
 		Items: &ItemSpec{
 			ItemSpec: s.Items,
 			Schemas:  make([]Schema, len(s.Items.Schemas)),

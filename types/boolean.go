@@ -22,7 +22,7 @@ type Boolean struct {
 
 func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 	vs := []validations.Validation{}
-	var cn, ct string
+
 	var pr bool
 	if s.Extras["IsPrivate"] != nil {
 		pr, _ = helpers.GetPrivate(s)
@@ -30,6 +30,7 @@ func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 		pr, _ = helpers.GetPrivate(ctx.Raw)
 	}
 
+	var cn, ct string
 	if s.Extras["column"] != nil {
 		cn, ct, _ = helpers.GetColumn(s)
 	} else {
