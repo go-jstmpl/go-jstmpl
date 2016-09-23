@@ -16,7 +16,7 @@ type Array struct {
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool
+	Private     bool
 	Properties  []Schema
 	Reference   string
 	Validations []validations.Validation
@@ -42,7 +42,7 @@ func NewArray(ctx *Context, s *schema.Schema) *Array {
 		Type:       helpers.SpaceToUpperCamelCase(s.Title),
 		Name:       helpers.SpaceToUpperCamelCase(s.Title),
 		key:        ctx.Key,
-		IsPrivate:  false,
+		Private:    false,
 		Items: &ItemSpec{
 			ItemSpec: s.Items,
 			Schemas:  make([]Schema, len(s.Items.Schemas)),
