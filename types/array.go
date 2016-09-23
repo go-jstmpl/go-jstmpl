@@ -28,9 +28,9 @@ func NewArray(ctx *Context, s *schema.Schema) *Array {
 	var cn, ct string
 
 	if s.Extras["column"] != nil {
-		cn, ct, _ = helpers.GetColumnData(s)
+		cn, ct, _ = helpers.GetColumn(s)
 	} else {
-		cn, ct, _ = helpers.GetColumnData(ctx.Raw)
+		cn, ct, _ = helpers.GetColumn(ctx.Raw)
 	}
 
 	return &Array{

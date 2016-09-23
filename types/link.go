@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"sort"
 
-	"github.com/go-jstmpl/go-jstmpl/helpers"
 	hschema "github.com/lestrrat/go-jshschema"
 )
 
@@ -90,7 +89,6 @@ func NewLink(l *hschema.Link, s, ts Schema, r *Root, us []Schema) (*Link, error)
 		Schema:        s,
 		TargetSchema:  ts,
 		URL:           u,
-		RouterHref:    helpers.EscapeJSONPath(l.Href),
 		UrlParameters: us,
 		Title:         l.Title,
 		Method:        l.Method,

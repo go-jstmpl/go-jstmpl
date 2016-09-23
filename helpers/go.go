@@ -48,7 +48,7 @@ func ConvertTagsForGo(n, cn string) string {
 	return s
 }
 
-func GetTableData(ts *schema.Schema) (tn string, err error) {
+func GetTable(ts *schema.Schema) (tn string, err error) {
 	if ts.Extras["table"] == nil {
 		return
 	}
@@ -67,7 +67,19 @@ func GetTableData(ts *schema.Schema) (tn string, err error) {
 	return
 }
 
-func GetColumnData(ts *schema.Schema) (cn, ct string, err error) {
+func GetPrivate(ts *schema.Schema) (bool, error) {
+	if ts.Extras["private"] == nil {
+		return false, nil
+	}
+
+	c, ok := ts.Extras["private"].(bool)
+	if !ok {
+		return false, fmt.Errorf("private %v is invalid type", ts.Extras["private"])
+	}
+	return c, nil
+}
+
+func GetColumn(ts *schema.Schema) (cn, ct string, err error) {
 	if ts.Extras["column"] == nil {
 		return
 	}

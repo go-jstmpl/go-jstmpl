@@ -27,9 +27,9 @@ type Object struct {
 func NewObject(ctx *Context, s *schema.Schema) *Object {
 	var tn string
 	if s.Extras["table"] != nil {
-		tn, _ = helpers.GetTableData(s)
+		tn, _ = helpers.GetTable(s)
 	} else {
-		tn, _ = helpers.GetTableData(ctx.Raw)
+		tn, _ = helpers.GetTable(ctx.Raw)
 	}
 	return &Object{
 		Schema:     s,

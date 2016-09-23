@@ -16,20 +16,25 @@ type Boolean struct {
 	Type        string
 	Name        string
 	key         string
-	IsPrivate   bool `json:"-"`
+	Private     bool
 	Validations []validations.Validation
 }
 
 func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 	vs := []validations.Validation{}
 	var cn, ct string
-
-	if s.Extras["column"] != nil {
-		cn, ct, _ = helpers.GetColumnData(s)
+	var pr bool
+	if s.Extras["IsPrivate"] != nil {
+		pr, _ = helpers.GetPrivate(s)
 	} else {
-		cn, ct, _ = helpers.GetColumnData(ctx.Raw)
+		pr, _ = helpers.GetPrivate(ctx.Raw)
 	}
 
+	if s.Extras["column"] != nil {
+		cn, ct, _ = helpers.GetColumn(s)
+	} else {
+		cn, ct, _ = helpers.GetColumn(ctx.Raw)
+	}
 	return &Boolean{
 		Schema:      s,
 		NativeType:  "boolean",
@@ -38,7 +43,7 @@ func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 		ColumnType:  ct,
 		Name:        helpers.SpaceToUpperCamelCase(s.Title),
 		key:         ctx.Key,
-		IsPrivate:   true,
+		Private:     pr,
 		Validations: vs,
 	}
 }

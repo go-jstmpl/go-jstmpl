@@ -15,11 +15,12 @@ type TestCaseConvertTagsForGo struct {
 }
 
 type TestCaseExtras struct {
-	Extras           map[string]interface{}
-	ExpectColumnName string
-	ExpectTableName  string
-	ExpectDbType     string
-	Title            string
+	Extras             map[string]interface{}
+	ExpectColumnName   string
+	ExpectTableName    string
+	ExpectDbType       string
+	ExpectPrivateState bool
+	Title              string
 }
 
 type TestCaseConvertArrayForGo struct {
@@ -111,12 +112,12 @@ func TestGetExtraData(t *testing.T) {
 		s := schema.New()
 		s.Extras = test.Extras
 
-		cn, ct, err := helpers.GetColumnData(s)
+		cn, ct, err := helpers.GetColumn(s)
 		if err != nil {
 			t.Errorf("%s: in GetColumnData, Extras: %s, Error: %s", test.Title, test.Extras, err)
 		}
 
-		tn, err := helpers.GetTableData(s)
+		tn, err := helpers.GetTable(s)
 		if err != nil {
 			t.Errorf("%s: in GetTableData, Extras: %s, Error: %s", test.Title, test.Extras, err)
 		}
