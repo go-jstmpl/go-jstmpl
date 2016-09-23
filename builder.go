@@ -3,6 +3,7 @@ package jstmpl
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/go-jstmpl/go-jstmpl/types"
 	"github.com/lestrrat/go-jshschema"
@@ -103,7 +104,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 			s, ts types.Schema
 			us    []types.Schema
 		)
-		m, err := GetUrlParameters(l.Href, hs.Schema, ctx)
+		m, href, err := ParseUrlParameters(l.Href, hs.Schema, ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -129,6 +130,7 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 		if err != nil {
 			return nil, err
 		}
+		rl.RouterHref = href
 		r.Links[i] = rl
 
 	}
@@ -141,8 +143,9 @@ func (b *Builder) Build(hs *hschema.HyperSchema) (*types.Root, error) {
 // catch properties. for example
 // if path = '/path/to/resources/{#/definitions/resource}', then
 // getting specified schema
-func GetUrlParameters(h string, t *schema.Schema, ctx *types.Context) ([]types.Schema, error) {
+func ParseUrlParameters(h string, t *schema.Schema, ctx *types.Context) ([]types.Schema, string, error) {
 	var m []types.Schema
+	var path string
 	var i, j int
 	b := false
 	// parse {...} type string
@@ -150,21 +153,31 @@ func GetUrlParameters(h string, t *schema.Schema, ctx *types.Context) ([]types.S
 		switch h[j : j+1] {
 		case "{":
 			i, b = j, true
+			path += ":"
 		case "}":
 			if !b {
-				return nil, fmt.Errorf("fail to parse url parameter: invalid URL: %+v", h)
+				return nil, path, fmt.Errorf("fail to parse url parameter: invalid URL: %+v", h)
 			}
+			// resolve schema
 			s := schema.New()
 			s.Reference = h[i:j]
 			scm, err := Resolve(s, t, ctx)
 			if err != nil {
-				return nil, fmt.Errorf("fail to parse url parameter: resolve: %+v", s)
+				return nil, path, fmt.Errorf("fail to parse url parameter: resolve: %+v", s)
 			}
 			m = append(m, scm)
+
+			// replace JSON Path to :hoge style
+			p := strings.Split(s.Reference, "/")
+			path += p[len(p)-1]
 			b = false
+		default:
+			if !b {
+				path += h[j : j+1]
+			}
 		}
 	}
-	return m, nil
+	return m, path, nil
 }
 
 func Resolve(s, t *schema.Schema, ctx *types.Context) (types.Schema, error) {

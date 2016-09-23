@@ -45,6 +45,9 @@ func TestBuilderParseQuery(t *testing.T) {
 		if l.UrlParameters == nil || len(l.UrlParameters) != 2 {
 			t.Fatal("fail to parse UrlParameters: %+v", ts)
 		}
+		if l.RouterHref != "/query/:test_integer/:test_boolean" {
+			t.Errorf("fail to Parse References: Href Expect: /query/:test_integer/:test_boolean, Actual: %s", l.RouterHref)
+		}
 		for _, p := range l.UrlParameters {
 			switch pp := p.(type) {
 			case *jstypes.Integer:
