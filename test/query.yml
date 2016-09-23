@@ -27,4 +27,3 @@ links:
     properties:
       test_multitype_link:
         $ref: '#/definitions/test_integer'
-   
