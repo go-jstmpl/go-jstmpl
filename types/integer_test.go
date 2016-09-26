@@ -64,3 +64,70 @@ func TestNewInteger(t *testing.T) {
 		}
 	}
 }
+
+func TestIntegerPrivateField(t *testing.T) {
+	type Case struct {
+		Context  *types.Context
+		Schema   *schema.Schema
+		Expected bool
+	}
+	cases := []Case{
+		{
+			Context: &types.Context{
+				Raw: &schema.Schema{},
+			},
+			Schema: &schema.Schema{
+				Items: &schema.ItemSpec{
+					Schemas: schema.SchemaList{},
+				},
+			},
+			Expected: false,
+		},
+		{
+			Context: &types.Context{
+				Raw: &schema.Schema{},
+			},
+			Schema: &schema.Schema{
+				Extras: map[string]interface{}{"private": true},
+				Items: &schema.ItemSpec{
+					Schemas: schema.SchemaList{},
+				},
+			},
+			Expected: true,
+		},
+		{
+			Context: &types.Context{
+				Raw: &schema.Schema{
+					Extras: map[string]interface{}{"private": true},
+				},
+			},
+			Schema: &schema.Schema{
+				Items: &schema.ItemSpec{
+					Schemas: schema.SchemaList{},
+				},
+			},
+			Expected: true,
+		},
+		{
+			Context: &types.Context{
+				Raw: &schema.Schema{
+					Extras: map[string]interface{}{"private": true},
+				},
+			},
+			Schema: &schema.Schema{
+				Extras: map[string]interface{}{"private": false},
+				Items: &schema.ItemSpec{
+					Schemas: schema.SchemaList{},
+				},
+			},
+			Expected: false,
+		},
+	}
+
+	for _, c := range cases {
+		s := types.NewInteger(c.Context, c.Schema)
+		if s.Private != c.Expected {
+			t.Errorf("Title expected %t but actual %t", c.Expected, s.Private)
+		}
+	}
+}
