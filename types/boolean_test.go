@@ -60,7 +60,74 @@ func TestNewBoolean(t *testing.T) {
 			t.Errorf("Format expected %s but actual %s", c.Expected.Format, s.Format())
 		}
 		if s.ReadOnly() != c.Expected.ReadOnly {
-			t.Errorf("ReadOnly expected %b but actual %b", c.Expected.ReadOnly, s.ReadOnly())
+			t.Errorf("ReadOnly expected %t but actual %t", c.Expected.ReadOnly, s.ReadOnly())
+		}
+	}
+}
+
+func TestBooleanPrivateField(t *testing.T) {
+	type Case struct {
+		Context  *types.Context
+		Schema   *schema.Schema
+		Expected bool
+	}
+	cases := []Case{
+		{
+			Context: &types.Context{
+				Raw: &schema.Schema{},
+			},
+			Schema: &schema.Schema{
+				Items: &schema.ItemSpec{
+					Schemas: schema.SchemaList{},
+				},
+			},
+			Expected: false,
+		},
+		{
+			Context: &types.Context{
+				Raw: &schema.Schema{},
+			},
+			Schema: &schema.Schema{
+				Extras: map[string]interface{}{"private": true},
+				Items: &schema.ItemSpec{
+					Schemas: schema.SchemaList{},
+				},
+			},
+			Expected: true,
+		},
+		{
+			Context: &types.Context{
+				Raw: &schema.Schema{
+					Extras: map[string]interface{}{"private": true},
+				},
+			},
+			Schema: &schema.Schema{
+				Items: &schema.ItemSpec{
+					Schemas: schema.SchemaList{},
+				},
+			},
+			Expected: true,
+		},
+		{
+			Context: &types.Context{
+				Raw: &schema.Schema{
+					Extras: map[string]interface{}{"private": true},
+				},
+			},
+			Schema: &schema.Schema{
+				Extras: map[string]interface{}{"private": false},
+				Items: &schema.ItemSpec{
+					Schemas: schema.SchemaList{},
+				},
+			},
+			Expected: false,
+		},
+	}
+
+	for _, c := range cases {
+		s := types.NewBoolean(c.Context, c.Schema)
+		if s.Private != c.Expected {
+			t.Errorf("Title expected %t but actual %t", c.Expected, s.Private)
 		}
 	}
 }
