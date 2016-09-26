@@ -26,7 +26,7 @@ type Object struct {
 
 func NewObject(ctx *Context, s *schema.Schema) *Object {
 	var pr bool
-	if s.Extras["IsPrivate"] != nil {
+	if s.Extras["private"] != nil {
 		pr, _ = helpers.GetPrivate(s)
 	} else {
 		pr, _ = helpers.GetPrivate(ctx.Raw)
