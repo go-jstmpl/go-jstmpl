@@ -20,18 +20,19 @@ type Undefined struct {
 
 func NewUndefined(ctx *Context, s *schema.Schema) *Undefined {
 	vs := []validations.Validation{}
-	var cn, ct string
 
+	var pr bool
+	if s.Extras["private"] != nil {
+		pr, _ = helpers.GetPrivate(s)
+	} else {
+		pr, _ = helpers.GetPrivate(ctx.Raw)
+	}
+
+	var cn, ct string
 	if s.Extras["column"] != nil {
 		cn, ct, _ = helpers.GetColumn(s)
 	} else {
 		cn, ct, _ = helpers.GetColumn(ctx.Raw)
-	}
-	var pr bool
-	if s.Extras["IsPrivate"] != nil {
-		pr, _ = helpers.GetPrivate(s)
-	} else {
-		pr, _ = helpers.GetPrivate(ctx.Raw)
 	}
 
 	return &Undefined{
