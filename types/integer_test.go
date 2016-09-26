@@ -60,7 +60,7 @@ func TestNewInteger(t *testing.T) {
 			t.Errorf("Format expected %s but actual %s", c.Expected.Format, s.Format())
 		}
 		if s.ReadOnly() != c.Expected.ReadOnly {
-			t.Errorf("ReadOnly expected %b but actual %b", c.Expected.ReadOnly, s.ReadOnly())
+			t.Errorf("ReadOnly expected %t but actual %t", c.Expected.ReadOnly, s.ReadOnly())
 		}
 	}
 }
