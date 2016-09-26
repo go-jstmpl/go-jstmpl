@@ -27,6 +27,7 @@ func (g *Generator) Process(out io.Writer, model *types.Root, tmpl []byte) error
 		"convertTypeForGo":      helpers.ConvertTypeForGo,
 		"convertTagsForGo":      helpers.ConvertTagsForGo,
 		"convertArrayForGo":     helpers.ConvertArrayForGo,
+		"convertTypeForJS":      helpers.ConvertTypeForJS,
 		"linkTitle":             helpers.LinkTitle,
 		"getKeyFromJSONPath":    helpers.GetKeyFromJSONPath,
 	}).Parse(string(tmpl)))

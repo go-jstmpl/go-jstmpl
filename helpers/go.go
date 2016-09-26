@@ -7,14 +7,12 @@ import (
 )
 
 func ConvertTypeForGo(s string) string {
-
 	conv := map[string]string{
 		"integer": "dbr.NullInt64",
 		"boolean": "dbr.NullBool",
 		"number":  "dbr.NullFloat64",
 		"string":  "dbr.NullString",
 	}
-
 	return conv[s]
 }
 
