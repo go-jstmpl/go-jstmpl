@@ -70,6 +70,7 @@ func TestIntegerPrivateField(t *testing.T) {
 		Context  *types.Context
 		Schema   *schema.Schema
 		Expected bool
+		Message  string
 	}
 	cases := []Case{
 		{
@@ -82,6 +83,7 @@ func TestIntegerPrivateField(t *testing.T) {
 				},
 			},
 			Expected: false,
+			Message:  "Tests with empty context and schema",
 		},
 		{
 			Context: &types.Context{
@@ -94,6 +96,7 @@ func TestIntegerPrivateField(t *testing.T) {
 				},
 			},
 			Expected: true,
+			Message:  "Tests with empty context",
 		},
 		{
 			Context: &types.Context{
@@ -107,6 +110,7 @@ func TestIntegerPrivateField(t *testing.T) {
 				},
 			},
 			Expected: true,
+			Message:  "Tests with empty context",
 		},
 		{
 			Context: &types.Context{
@@ -121,13 +125,14 @@ func TestIntegerPrivateField(t *testing.T) {
 				},
 			},
 			Expected: false,
+			Message:  "Tests with filled schema",
 		},
 	}
 
 	for _, c := range cases {
 		s := types.NewInteger(c.Context, c.Schema)
 		if s.Private != c.Expected {
-			t.Errorf("Title expected %t but actual %t", c.Expected, s.Private)
+			t.Errorf("%s: expected %t, but actual %t.", c.Message, c.Expected, s.Private)
 		}
 	}
 }

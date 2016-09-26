@@ -30,11 +30,12 @@ func TestNewArray(t *testing.T) {
 	}
 }
 
-func TestArrayPrivateField(t *testing.T) {
+func TestPrivateFieldWithArray(t *testing.T) {
 	type Case struct {
 		Context  *types.Context
 		Schema   *schema.Schema
 		Expected bool
+		Message  string
 	}
 	cases := []Case{
 		{
@@ -47,6 +48,7 @@ func TestArrayPrivateField(t *testing.T) {
 				},
 			},
 			Expected: false,
+			Message:  "Tests with empty context and schema",
 		},
 		{
 			Context: &types.Context{
@@ -59,6 +61,7 @@ func TestArrayPrivateField(t *testing.T) {
 				},
 			},
 			Expected: true,
+			Message:  "Tests with empty context",
 		},
 		{
 			Context: &types.Context{
@@ -72,6 +75,7 @@ func TestArrayPrivateField(t *testing.T) {
 				},
 			},
 			Expected: true,
+			Message:  "Tests with empty context",
 		},
 		{
 			Context: &types.Context{
@@ -86,13 +90,14 @@ func TestArrayPrivateField(t *testing.T) {
 				},
 			},
 			Expected: false,
+			Message:  "Tests with filled schema",
 		},
 	}
 
 	for _, c := range cases {
 		s := types.NewArray(c.Context, c.Schema)
 		if s.Private != c.Expected {
-			t.Errorf("Title expected %t but actual %t", c.Expected, s.Private)
+			t.Errorf("%s: expected %t, but actual %t.", c.Message, c.Expected, s.Private)
 		}
 	}
 }
