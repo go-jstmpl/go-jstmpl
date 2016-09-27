@@ -1,13 +1,11 @@
 package helpers
 
 func ConvertTypeForJS(s string) string {
-	conv := map[string]string{
-		"array":   "array",
-		"boolean": "boolean",
+	v, ok := map[string]string{
 		"integer": "number",
-		"number":  "number",
-		"object":  "object",
-		"string":  "string",
+	}[s]
+	if !ok {
+		return s
 	}
-	return conv[s]
+	return v
 }
