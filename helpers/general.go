@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"regexp"
@@ -21,65 +20,11 @@ func NotLast(i, len int) bool {
 
 func GetKeyFromJSONPath(url string) string {
 	s := strings.Split(url, "/")
-	return SnakeToUpperCamelCase(s[len(s)-1])
+	return UpperCamelCase(s[len(s)-1])
 }
 
 func LinkTitle(title, method, suffix string) string {
-	return method + SpaceToUpperCamelCase(title) + suffix
-}
-
-func SpaceToUpperCamelCase(s string) string {
-	if s == "" {
-		return ""
-	}
-	buf := bytes.Buffer{}
-	for _, p := range rspace.Split(s, -1) {
-		buf.WriteString(strings.ToUpper(p[:1]))
-		buf.WriteString(p[1:])
-	}
-	return buf.String()
-}
-
-func SnakeToUpperCamelCase(s string) string {
-	if s == "" {
-		return ""
-	}
-	buf := bytes.Buffer{}
-	for _, p := range rsnake.Split(s, -1) {
-		buf.WriteString(strings.ToUpper(p[:1]))
-		buf.WriteString(p[1:])
-	}
-	return buf.String()
-}
-
-func SnakeToLowerCamelCase(s string) string {
-	if s == "" {
-		return ""
-	}
-	buf := bytes.Buffer{}
-	for i, p := range rsnake.Split(s, -1) {
-		if i == 0 {
-			buf.WriteString(p)
-			continue
-		}
-		buf.WriteString(strings.ToUpper(p[:1]))
-		buf.WriteString(p[1:])
-	}
-	return buf.String()
-}
-
-func ToUpperFirst(s string) string {
-	buf := bytes.Buffer{}
-	buf.WriteString(strings.ToUpper(s[:1]))
-	buf.WriteString(s[1:])
-	return buf.String()
-}
-
-func ToLowerFirst(s string) string {
-	buf := bytes.Buffer{}
-	buf.WriteString(strings.ToLower(s[:1]))
-	buf.WriteString(s[1:])
-	return buf.String()
+	return method + UpperCamelCase(title) + suffix
 }
 
 func JoinTypes(ts schema.PrimitiveTypes, sep string) string {
