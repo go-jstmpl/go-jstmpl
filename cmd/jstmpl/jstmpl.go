@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/go-jstmpl/go-jstmpl"
@@ -20,10 +21,10 @@ func main() {
 }
 
 type options struct {
-	DumpFile string `short:"d" long:"dump" description:"output file to inter-generate data structure"`
-	Schema   string `short:"s" long:"schema" description:"the source JSON Schema file"`
-	OutDir   string `short:"o" long:"outfile" description:"output file to generate"`
-	Template string `short:"t" log:"tmpl" description:"template file to generate document"`
+	DumpFile string `short:"d" long:"dump" description:"intermediate data"`
+	OutDir   string `short:"o" long:"output" description:"output directory"`
+	Schema   string `short:"s" long:"schema" description:"JSON Schema file"`
+	Template string `short:"t" long:"template" description:"template directory"`
 }
 
 func _main() int {
@@ -83,7 +84,7 @@ func _main() int {
 
 		switch d {
 		case "stdout":
-			fmt.Printf("%s", b)
+			fmt.Printf("%s\n", b)
 		default:
 			if err := ioutil.WriteFile(d, b, 0775); err != nil {
 				log.Printf("fail to write dump data at %s: %s", d, err)
@@ -103,6 +104,10 @@ func _main() int {
 			return err
 		}
 		o := filepath.Join(opts.OutDir, r)
+		ext := filepath.Ext(o)
+		if ext == ".tmpl" {
+			o = strings.TrimRight(o, ext)
+		}
 
 		var tmpl []byte
 		if i != "" {
