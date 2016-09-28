@@ -59,7 +59,7 @@ func NewString(ctx *Context, s *schema.Schema) *String {
 		Type:        "string",
 		ColumnName:  cn,
 		ColumnType:  ct,
-		Name:        helpers.SpaceToUpperCamelCase(s.Title),
+		Name:        helpers.UpperCamelCase(s.Title),
 		key:         ctx.Key,
 		Private:     pr,
 		Validations: vs,

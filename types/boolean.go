@@ -42,7 +42,7 @@ func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 		Type:        "boolean",
 		ColumnName:  cn,
 		ColumnType:  ct,
-		Name:        helpers.SpaceToUpperCamelCase(s.Title),
+		Name:        helpers.UpperCamelCase(s.Title),
 		key:         ctx.Key,
 		Private:     pr,
 		Validations: vs,
