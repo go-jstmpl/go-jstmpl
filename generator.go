@@ -16,20 +16,26 @@ func NewGenerator() *Generator {
 
 func (g *Generator) Process(out io.Writer, model *types.Root, tmpl []byte) error {
 	t := template.Must(template.New("").Delims("/*", "*/").Funcs(map[string]interface{}{
-		"toUpperFirst":          helpers.ToUpperFirst,
-		"toLowerFirst":          helpers.ToLowerFirst,
-		"notLast":               helpers.NotLast,
+		"notLast":            helpers.NotLast,
+		"joinTypes":          helpers.JoinTypes,
+		"serialize":          helpers.Serialize,
+		"convertTypeForGo":   helpers.ConvertTypeForGo,
+		"convertTagsForGo":   helpers.ConvertTagsForGo,
+		"convertArrayForGo":  helpers.ConvertArrayForGo,
+		"convertTypeForJS":   helpers.ConvertTypeForJS,
+		"linkTitle":          helpers.LinkTitle,
+		"getKeyFromJSONPath": helpers.GetKeyFromJSONPath,
+		"snakeCase":          helpers.SnakeCase,
+		"lowerSnakeCase":     helpers.LowerSnakeCase,
+		"upperSnakeCase":     helpers.UpperSnakeCase,
+		"lowerCamelCase":     helpers.LowerCamelCase,
+		"upperCamelCase":     helpers.UpperCamelCase,
+		// Deprecated
 		"spaceToUpperCamelCase": helpers.SpaceToUpperCamelCase,
 		"snakeToUpperCamelCase": helpers.SnakeToUpperCamelCase,
 		"snakeToLowerCamelCase": helpers.SnakeToLowerCamelCase,
-		"joinTypes":             helpers.JoinTypes,
-		"serialize":             helpers.Serialize,
-		"convertTypeForGo":      helpers.ConvertTypeForGo,
-		"convertTagsForGo":      helpers.ConvertTagsForGo,
-		"convertArrayForGo":     helpers.ConvertArrayForGo,
-		"convertTypeForJS":      helpers.ConvertTypeForJS,
-		"linkTitle":             helpers.LinkTitle,
-		"getKeyFromJSONPath":    helpers.GetKeyFromJSONPath,
+		"toUpperFirst":          helpers.ToUpperFirst,
+		"toLowerFirst":          helpers.ToLowerFirst,
 	}).Parse(string(tmpl)))
 	if err := t.Execute(out, model); err != nil {
 		return err

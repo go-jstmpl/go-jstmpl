@@ -51,7 +51,7 @@ func NewNumber(ctx *Context, s *schema.Schema) *Number {
 		Type:        "number",
 		ColumnName:  cn,
 		ColumnType:  ct,
-		Name:        helpers.SpaceToUpperCamelCase(s.Title),
+		Name:        helpers.UpperCamelCase(s.Title),
 		key:         ctx.Key,
 		Private:     pr,
 		Validations: vs,

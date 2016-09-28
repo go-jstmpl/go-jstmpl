@@ -41,7 +41,7 @@ func NewUndefined(ctx *Context, s *schema.Schema) *Undefined {
 		Type:        "undefined",
 		ColumnName:  cn,
 		ColumnType:  ct,
-		Name:        helpers.SpaceToUpperCamelCase(s.Title),
+		Name:        helpers.UpperCamelCase(s.Title),
 		key:         ctx.Key,
 		Private:     pr,
 		Validations: vs,

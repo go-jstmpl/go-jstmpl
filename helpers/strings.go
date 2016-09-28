@@ -1,33 +1,11 @@
 package helpers
 
 import (
-	"encoding/json"
+	"bytes"
 	"fmt"
-	"regexp"
 	"strings"
 	"unicode"
-
-	schema "github.com/lestrrat/go-jsschema"
 )
-
-var (
-	rspace = regexp.MustCompile(`\s+`)
-	rsnake = regexp.MustCompile(`_`)
-)
-
-func NotLast(i, len int) bool {
-	return i != len-1
-}
-
-func GetKeyFromJSONPath(url string) string {
-	s := strings.Split(url, "/")
-	return UpperCamelCase(s[len(s)-1])
-}
-
-func LinkTitle(title, method, suffix string) string {
-<<<<<<< HEAD
-	return method + SpaceToUpperCamelCase(title) + suffix
-}
 
 func isAlphabetical(c rune) bool {
 	return isLower(c) || isUpper(c)
@@ -108,6 +86,7 @@ func CamelCase(s string, fn convert) string {
 	return b.String()
 }
 
+// SpaceToUpperCamelCase is deprecated
 func SpaceToUpperCamelCase(s string) string {
 	fmt.Printf("Warning: helpers.SpaceToUpperCamelCase is deprecated\n")
 	if s == "" {
@@ -121,6 +100,7 @@ func SpaceToUpperCamelCase(s string) string {
 	return buf.String()
 }
 
+// SnakeToUpperCamelCase is deprecated
 func SnakeToUpperCamelCase(s string) string {
 	fmt.Printf("Warning: helpers.SnakeToUpperCamelCase is deprecated\n")
 	if s == "" {
@@ -134,6 +114,7 @@ func SnakeToUpperCamelCase(s string) string {
 	return buf.String()
 }
 
+// SnakeToLowerCamelCase is deprecated
 func SnakeToLowerCamelCase(s string) string {
 	fmt.Printf("Warning: helpers.SnakeToLowerCamelCase is deprecated\n")
 	if s == "" {
@@ -151,6 +132,7 @@ func SnakeToLowerCamelCase(s string) string {
 	return buf.String()
 }
 
+// ToUpperFirst is deprecated
 func ToUpperFirst(s string) string {
 	fmt.Printf("Warning: helpers.ToUpperFirst is deprecated\n")
 	buf := bytes.Buffer{}
@@ -159,29 +141,11 @@ func ToUpperFirst(s string) string {
 	return buf.String()
 }
 
+// ToLowerFirst is deprecated
 func ToLowerFirst(s string) string {
 	fmt.Printf("Warning: helpers.ToLowerFirst is deprecated\n")
 	buf := bytes.Buffer{}
 	buf.WriteString(strings.ToLower(s[:1]))
 	buf.WriteString(s[1:])
 	return buf.String()
-=======
-	return method + UpperCamelCase(title) + suffix
->>>>>>> dcca2a8484d70d41b1e902fdb469775f7e9f1c2c
-}
-
-func JoinTypes(ts schema.PrimitiveTypes, sep string) string {
-	var strs []string
-	for _, t := range ts {
-		strs = append(strs, t.String())
-	}
-	return strings.Join(strs, sep)
-}
-
-func Serialize(v interface{}) string {
-	j, err := json.Marshal(v)
-	if err != nil {
-		return fmt.Sprint(v)
-	}
-	return string(j)
 }
