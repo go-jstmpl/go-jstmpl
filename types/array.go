@@ -45,8 +45,8 @@ func NewArray(ctx *Context, s *schema.Schema) *Array {
 		ColumnName: cn,
 		ColumnType: ct,
 		Reference:  ctx.Raw.Reference,
-		Type:       helpers.SpaceToUpperCamelCase(s.Title),
-		Name:       helpers.SpaceToUpperCamelCase(s.Title),
+		Type:       helpers.UpperCamelCase(s.Title),
+		Name:       helpers.UpperCamelCase(s.Title),
 		key:        ctx.Key,
 		Private:    pr,
 		Items: &ItemSpec{
