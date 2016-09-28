@@ -43,10 +43,10 @@ func Serialize(v interface{}) string {
 	return string(j)
 }
 
-func ConvertToStringLiteral(v interface{}) string {
+func ToStringLiteral(v interface{}) string {
 	s, ok := v.(string)
 	if ok {
 		return fmt.Sprintf("\"%s\"", s)
 	}
-	return fmt.Sprintf("%s", v)
+	return fmt.Sprint(v)
 }
