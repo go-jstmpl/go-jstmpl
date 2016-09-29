@@ -15,7 +15,7 @@ func NewGenerator() *Generator {
 }
 
 func (g *Generator) Process(out io.Writer, model *types.Root, tmpl []byte) error {
-	t := template.Must(template.New("").Delims("/*", "*/").Funcs(map[string]interface{}{
+	t := template.Must(template.New("").Funcs(map[string]interface{}{
 		"notLast":            helpers.NotLast,
 		"joinTypes":          helpers.JoinTypes,
 		"serialize":          helpers.Serialize,
