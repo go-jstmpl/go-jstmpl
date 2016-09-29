@@ -6,7 +6,7 @@ import (
 	"github.com/go-jstmpl/go-jstmpl/helpers"
 )
 
-func TestConvertToStringLiteral(t *testing.T) {
+func TestToStringLiteral(t *testing.T) {
 	type Case struct {
 		Input    interface{}
 		Expected string
