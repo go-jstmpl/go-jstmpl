@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -122,7 +121,12 @@ func _main() int {
 			}
 		}
 
-		var out io.Writer
+		g := jstmpl.NewGenerator()
+		b, err := g.Process(ts, tmpl, filepath.Ext(o))
+		if err != nil {
+			return err
+		}
+
 		if o != "" {
 			d := filepath.Dir(o)
 			_, err := os.Stat(d)
@@ -132,17 +136,9 @@ func _main() int {
 					return err
 				}
 			}
-			f, err := os.Create(o)
-			if err != nil {
+			if err := ioutil.WriteFile(o, b, 0644); err != nil {
 				return err
 			}
-			defer f.Close()
-			out = f
-		}
-
-		g := jstmpl.NewGenerator()
-		if err := g.Process(out, ts, tmpl); err != nil {
-			return err
 		}
 
 		return nil

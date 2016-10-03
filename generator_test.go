@@ -1,7 +1,6 @@
 package jstmpl_test
 
 import (
-	"io"
 	"testing"
 
 	"github.com/go-jstmpl/go-jstmpl"
@@ -9,26 +8,32 @@ import (
 )
 
 type TestGenerateCase struct {
-	Template []byte
-	Root     *types.Root
-	Pass     bool
-	Explain  string
+	Root      *types.Root
+	Template  string
+	Extension string
+	Expected  string
+	Message   string
 }
 
 func TestGenerater(t *testing.T) {
 	gen := jstmpl.NewGenerator()
-	tests := []TestGenerateCase{{
-		Template: []byte{},
-		Root:     &types.Root{},
-		Pass:     true,
-		Explain:  "pass",
-	}}
+	cases := []TestGenerateCase{
+		{
+			Root:      &types.Root{},
+			Template:  "package main\n\nimport \"fmt\"\n\nfunc main () {\n    fmt.Println(\"foo\")\n}",
+			Extension: ".go",
+			Expected:  "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"foo\")\n}\n",
+			Message:   "Format with Go",
+		},
+	}
 
-	var out io.Writer
-	for _, test := range tests {
-		err := gen.Process(out, test.Root, test.Template)
+	for _, c := range cases {
+		b, err := gen.Process(c.Root, []byte(c.Template), c.Extension)
 		if err != nil {
-			t.Fatalf("generate error: %s: %v", test.Explain, err)
+			t.Fatalf("%s: returns error %+v", c.Message, err)
+		}
+		if actual := string(b); actual != c.Expected {
+			t.Errorf("%s: \nexpected\n-----\n%s\n-----\nactual\n-----\n%s\n-----", c.Message, c.Expected, actual)
 		}
 	}
 }

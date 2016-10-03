@@ -1,7 +1,8 @@
 package jstmpl
 
 import (
-	"io"
+	"bytes"
+	"go/format"
 	"text/template"
 
 	"github.com/go-jstmpl/go-jstmpl/helpers"
@@ -14,7 +15,8 @@ func NewGenerator() *Generator {
 	return &Generator{}
 }
 
-func (g *Generator) Process(out io.Writer, model *types.Root, tmpl []byte) error {
+func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte, error) {
+	out := bytes.NewBuffer([]byte{})
 	t := template.Must(template.New("").Funcs(map[string]interface{}{
 		"notLast":            helpers.NotLast,
 		"joinTypes":          helpers.JoinTypes,
@@ -39,7 +41,19 @@ func (g *Generator) Process(out io.Writer, model *types.Root, tmpl []byte) error
 		"toLowerFirst":          helpers.ToLowerFirst,
 	}).Parse(string(tmpl)))
 	if err := t.Execute(out, model); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	// Format for each language
+	b := out.Bytes()
+	switch ext {
+	case ".go":
+		var err error
+		b, err = format.Source(b)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return b, nil
 }
