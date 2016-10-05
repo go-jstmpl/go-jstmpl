@@ -3,6 +3,7 @@ package jstmpl
 import (
 	"bytes"
 	"go/format"
+	"os"
 	"text/template"
 
 	"github.com/go-jstmpl/go-jstmpl/helpers"
@@ -18,6 +19,7 @@ func NewGenerator() *Generator {
 func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte, error) {
 	out := bytes.NewBuffer([]byte{})
 	t := template.Must(template.New("").Funcs(map[string]interface{}{
+		"getEnv":             os.Getenv,
 		"notLast":            helpers.NotLast,
 		"joinTypes":          helpers.JoinTypes,
 		"serialize":          helpers.Serialize,
