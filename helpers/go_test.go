@@ -31,8 +31,8 @@ type TestCaseConvertArrayForGo struct {
 
 func TestConvertArrayForGo(t *testing.T) {
 	tests := []TestCaseConvertArrayForGo{{
-		Input:  []string{"foo", "bar"},
-		Expect: "[]string{\"foo\",\"bar\"}",
+		Input:  []string{"foo_bar", "bar"},
+		Expect: "[]string{\"FooBar\",\"Bar\"}",
 		Title:  "pass test",
 	}, {
 		Input:  []string{},

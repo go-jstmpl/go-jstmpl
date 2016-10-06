@@ -20,9 +20,9 @@ func ConvertArrayForGo(m []string) string {
 	s := "[]string{"
 	for i, v := range m {
 		if i != len(m)-1 {
-			s += fmt.Sprintf("\"%s\",", v)
+			s += fmt.Sprintf("\"%s\",", UpperCamelCase(v))
 		} else {
-			s += fmt.Sprintf("\"%s\"", v)
+			s += fmt.Sprintf("\"%s\"", UpperCamelCase(v))
 		}
 	}
 	s += "}"
