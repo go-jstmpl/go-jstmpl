@@ -54,8 +54,13 @@ func TestLowerSnakeCase(t *testing.T) {
 			Message:  "upper camel case",
 		},
 		Case{
-			Input:    "_mixed veryUgly_Case_",
-			Expected: "_mixed_very_ugly_case_",
+			Input:    "numeric 00 string",
+			Expected: "numeric_00_string",
+			Message:  "numeric string",
+		},
+		Case{
+			Input:    "_mixed veryUgly_00_Case_",
+			Expected: "_mixed_very_ugly_00_case_",
 			Message:  "mixed very ugly case",
 		},
 	}
@@ -115,8 +120,13 @@ func TestUpperSnakeCase(t *testing.T) {
 			Message:  "upper camel case",
 		},
 		Case{
-			Input:    "_mixed veryUgly_Case_",
-			Expected: "_MIXED_VERY_UGLY_CASE_",
+			Input:    "numeric 00 string",
+			Expected: "NUMERIC_00_STRING",
+			Message:  "numeric string",
+		},
+		Case{
+			Input:    "_mixed veryUgly_00_Case_",
+			Expected: "_MIXED_VERY_UGLY_00_CASE_",
 			Message:  "mixed very ugly case",
 		},
 	}
@@ -176,8 +186,13 @@ func TestLowerCamelCase(t *testing.T) {
 			Message:  "upper camel case",
 		},
 		Case{
-			Input:    "_mixed veryUgly_Case_",
-			Expected: "mixedVeryUglyCase",
+			Input:    "numeric 00 string",
+			Expected: "numeric00String",
+			Message:  "numeric string",
+		},
+		Case{
+			Input:    "_mixed veryUgly_00_Case_",
+			Expected: "mixedVeryUgly00Case",
 			Message:  "mixed very ugly case",
 		},
 	}
@@ -237,8 +252,13 @@ func TestUpperCamelCase(t *testing.T) {
 			Message:  "upper camel case",
 		},
 		Case{
-			Input:    "_mixed veryUgly_Case_",
-			Expected: "MixedVeryUglyCase",
+			Input:    "numeric 00 string",
+			Expected: "Numeric00String",
+			Message:  "numeric string",
+		},
+		Case{
+			Input:    "_mixed veryUgly_00_Case_",
+			Expected: "MixedVeryUgly00Case",
 			Message:  "mixed very ugly case",
 		},
 	}

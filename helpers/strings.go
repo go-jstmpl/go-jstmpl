@@ -19,6 +19,10 @@ func isLower(c rune) bool {
 	return 'a' <= c && 'z' >= c
 }
 
+func isNumeric(c rune) bool {
+	return '0' <= c && '9' >= c
+}
+
 func LowerSnakeCase(s string) string {
 	return strings.ToLower(SnakeCase(s))
 }
@@ -43,7 +47,7 @@ func Chop(s string, d rune) string {
 				}
 			}
 			b.WriteRune(c)
-		case !isAlphabetical(c):
+		case !(isAlphabetical(c) || isNumeric(c)):
 			b.WriteRune(d)
 		default:
 			b.WriteRune(c)
@@ -69,7 +73,7 @@ func CamelCase(s string, fn convert) string {
 	for i := 0; i < len(s); i++ {
 		c := rune(s[i])
 		switch {
-		case !isAlphabetical(c):
+		case !(isAlphabetical(c) || isNumeric(c)):
 			apply = true
 		case first:
 			first = false
