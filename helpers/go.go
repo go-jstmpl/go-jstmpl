@@ -7,13 +7,27 @@ import (
 )
 
 func ConvertTypeForGo(s string) string {
-	conv := map[string]string{
-		"integer": "dbr.NullInt64",
-		"boolean": "dbr.NullBool",
-		"number":  "dbr.NullFloat64",
-		"string":  "dbr.NullString",
+	v, ok := map[string]string{
+		"integer": "int64",
+		"boolean": "bool",
+		"number":  "float64",
+	}[s]
+	if !ok {
+		return s
 	}
-	return conv[s]
+	return v
+}
+
+func ConvertTypeInJSONForGo(s string) string {
+	v, ok := map[string]string{
+		"integer": "float64",
+		"boolean": "bool",
+		"number":  "float64",
+	}[s]
+	if !ok {
+		return s
+	}
+	return v
 }
 
 func ConvertArrayForGo(m []string) string {
