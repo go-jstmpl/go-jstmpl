@@ -43,21 +43,18 @@ func ConvertArrayForGo(m []string) string {
 	return s
 }
 
-func ConvertTagsForGo(n, cn string) string {
-	s := "`"
-	if n != "-" {
-		s += fmt.Sprintf("json:\"%s, omitempty\" ", n)
-	} else {
-		s += fmt.Sprint("json:\"-\" ")
+func ConvertJSONTagForGo(tag string) string {
+	if tag == "" || tag == "-" {
+		return "json:\"-\""
 	}
+	return fmt.Sprintf("json:\"%s,omitempty\"", tag)
+}
 
-	if cn != "" {
-		s += fmt.Sprintf("xorm:\"%s\"", cn)
-	} else {
-		s += fmt.Sprint("xorm:\"-\"")
+func ConvertXORMTagForGo(tag string) string {
+	if tag == "" || tag == "-" {
+		return "xorm:\"-\""
 	}
-	s += "`"
-	return s
+	return fmt.Sprintf("xorm:\"%s\"", tag)
 }
 
 func GetTable(ts *schema.Schema) (tn string, err error) {
