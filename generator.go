@@ -26,7 +26,8 @@ func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte,
 		"toStringLiteral":        helpers.ToStringLiteral,
 		"convertTypeForGo":       helpers.ConvertTypeForGo,
 		"convertTypeInJSONForGo": helpers.ConvertTypeInJSONForGo,
-		"convertTagsForGo":       helpers.ConvertTagsForGo,
+		"jsonTagForGo":           helpers.ConvertJSONTagForGo,
+		"xormTagForGo":           helpers.ConvertXORMTagForGo,
 		"convertArrayForGo":      helpers.ConvertArrayForGo,
 		"convertTypeForJS":       helpers.ConvertTypeForJS,
 		"linkTitle":              helpers.LinkTitle,
@@ -36,12 +37,6 @@ func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte,
 		"upperSnakeCase":         helpers.UpperSnakeCase,
 		"lowerCamelCase":         helpers.LowerCamelCase,
 		"upperCamelCase":         helpers.UpperCamelCase,
-		// Deprecated
-		"spaceToUpperCamelCase": helpers.SpaceToUpperCamelCase,
-		"snakeToUpperCamelCase": helpers.SnakeToUpperCamelCase,
-		"snakeToLowerCamelCase": helpers.SnakeToLowerCamelCase,
-		"toUpperFirst":          helpers.ToUpperFirst,
-		"toLowerFirst":          helpers.ToLowerFirst,
 	}).Parse(string(tmpl)))
 	if err := t.Execute(out, model); err != nil {
 		return nil, err
