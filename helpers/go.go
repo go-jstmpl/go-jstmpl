@@ -44,14 +44,14 @@ func ConvertArrayForGo(m []string) string {
 }
 
 func ConvertJSONTagForGo(tag string) string {
-	if tag == "" {
+	if tag == "" || tag == "-" {
 		return "json:\"-\""
 	}
 	return fmt.Sprintf("json:\"%s,omitempty\"", tag)
 }
 
 func ConvertXORMTagForGo(tag string) string {
-	if tag == "" {
+	if tag == "" || tag == "-" {
 		return "xorm:\"-\""
 	}
 	return fmt.Sprintf("xorm:\"%s\"", tag)
