@@ -16,6 +16,14 @@ func NewGenerator() *Generator {
 	return &Generator{}
 }
 
+type FormatError struct {
+	message string
+}
+
+func (err FormatError) Error() string {
+	return err.message
+}
+
 func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte, error) {
 	out := bytes.NewBuffer([]byte{})
 	t := template.Must(template.New("").Funcs(map[string]interface{}{
@@ -24,6 +32,7 @@ func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte,
 		"joinTypes":              helpers.JoinTypes,
 		"serialize":              helpers.Serialize,
 		"toStringLiteral":        helpers.ToStringLiteral,
+		"toLiteralForGo":         helpers.ToLiteralForGo,
 		"convertTypeForGo":       helpers.ConvertTypeForGo,
 		"convertTypeInJSONForGo": helpers.ConvertTypeInJSONForGo,
 		"jsonTagForGo":           helpers.ConvertJSONTagForGo,
@@ -47,10 +56,11 @@ func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte,
 	switch ext {
 	case ".go":
 		var err error
-		b, err = format.Source(b)
+		formatted, err := format.Source(b)
 		if err != nil {
-			return nil, err
+			return b, FormatError{err.Error()}
 		}
+		b = formatted
 	}
 
 	return b, nil
