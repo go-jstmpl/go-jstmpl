@@ -11,12 +11,14 @@ import (
 
 func ToLiteralForGo(input interface{}) string {
 	switch t := input.(type) {
-	case string:
-		return fmt.Sprintf("\"%s\"", t)
-	case int, int32, int64:
+	case bool:
+		return fmt.Sprintf("%b", t)
+	case int, int8, int16, int32, int64:
 		return fmt.Sprintf("%d", t)
 	case float32, float64:
 		return fmt.Sprintf("%f", t)
+	case string:
+		return fmt.Sprintf("\"%s\"", t)
 	}
 	switch reflect.TypeOf(input).Kind() {
 	case reflect.Slice:
