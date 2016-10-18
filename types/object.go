@@ -10,7 +10,7 @@ import (
 
 type Object struct {
 	*schema.Schema
-	NativeType  string `json:"-"`
+	NativeType  string
 	TableName   string
 	ColumnName  string
 	ColumnType  string
@@ -57,6 +57,7 @@ func (o Object) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"Title":       o.Title(),
 		"Description": o.Description,
+		"NativeType":  o.NativeType,
 		"Type":        o.Type,
 		"Name":        o.Name,
 		"Required":    o.Required,

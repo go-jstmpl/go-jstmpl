@@ -122,9 +122,11 @@ func _main() int {
 		}
 
 		g := jstmpl.NewGenerator()
-		b, err := g.Process(ts, tmpl, filepath.Ext(o))
-		if err != nil {
-			return err
+		b, gpErr := g.Process(ts, tmpl, filepath.Ext(o))
+		if gpErr != nil {
+			if _, ok := gpErr.(jstmpl.FormatError); !ok {
+				return gpErr
+			}
 		}
 
 		if o != "" {
@@ -139,6 +141,10 @@ func _main() int {
 			if err := ioutil.WriteFile(o, b, 0644); err != nil {
 				return err
 			}
+		}
+
+		if gpErr != nil {
+			return gpErr
 		}
 
 		return nil

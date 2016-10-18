@@ -10,7 +10,7 @@ import (
 
 type Number struct {
 	*schema.Schema
-	NativeType  string `json:"-"`
+	NativeType  string
 	ColumnName  string
 	ColumnType  string
 	Type        string
@@ -22,6 +22,10 @@ type Number struct {
 
 func NewNumber(ctx *Context, s *schema.Schema) *Number {
 	vs := []validations.Validation{}
+	if v, err := validations.NewNumberEnumValidation(s); err == nil {
+		ctx.AddValidation(v)
+		vs = append(vs, v)
+	}
 	if v, err := validations.NewMaximumValidation(s); err == nil {
 		ctx.AddValidation(v)
 		vs = append(vs, v)
@@ -62,6 +66,7 @@ func (o Number) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"Title":       o.Title(),
 		"Description": o.Description,
+		"NativeType":  o.NativeType,
 		"Type":        o.Type,
 		"Name":        o.Name,
 		"Required":    o.Required,

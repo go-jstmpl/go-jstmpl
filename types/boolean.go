@@ -10,7 +10,7 @@ import (
 
 type Boolean struct {
 	*schema.Schema
-	NativeType  string `json:"-"`
+	NativeType  string
 	ColumnName  string
 	ColumnType  string
 	Type        string
@@ -22,6 +22,10 @@ type Boolean struct {
 
 func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 	vs := []validations.Validation{}
+	if v, err := validations.NewStringEnumValidation(s); err == nil {
+		ctx.AddValidation(v)
+		vs = append(vs, v)
+	}
 
 	var pr bool
 	if s.Extras["private"] != nil {
@@ -53,6 +57,7 @@ func (o Boolean) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"Title":       o.Title(),
 		"Description": o.Description,
+		"NativeType":  o.NativeType,
 		"Type":        o.Type,
 		"Name":        o.Name,
 		"Required":    o.Required,

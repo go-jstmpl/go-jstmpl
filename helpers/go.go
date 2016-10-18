@@ -1,10 +1,40 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
+	"reflect"
+	"strings"
 
 	schema "github.com/lestrrat/go-jsschema"
 )
+
+func ToLiteralForGo(input interface{}) string {
+	switch t := input.(type) {
+	case string:
+		return fmt.Sprintf("\"%s\"", t)
+	case int, int32, int64:
+		return fmt.Sprintf("%d", t)
+	case float32, float64:
+		return fmt.Sprintf("%f", t)
+	}
+	switch reflect.TypeOf(input).Kind() {
+	case reflect.Slice:
+		t := reflect.ValueOf(input)
+		l := t.Len()
+		es := make([]string, l)
+		for i := 0; i < l; i++ {
+			e := t.Index(i)
+			es[i] = ToLiteralForGo(e.Interface())
+		}
+		return fmt.Sprintf("[]%s{%s}", reflect.TypeOf(input).Elem().Kind().String(), strings.Join(es, ", "))
+	}
+	b, err := json.Marshal(input)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return string(b)
+}
 
 func ConvertTypeForGo(s string) string {
 	v, ok := map[string]string{
