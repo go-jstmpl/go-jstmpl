@@ -22,6 +22,10 @@ type Integer struct {
 
 func NewInteger(ctx *Context, s *schema.Schema) *Integer {
 	vs := []validations.Validation{}
+	if v, err := validations.NewIntegerEnumValidation(s); err == nil {
+		ctx.AddValidation(v)
+		vs = append(vs, v)
+	}
 	if v, err := validations.NewMaximumValidation(s); err == nil {
 		ctx.AddValidation(v)
 		vs = append(vs, v)

@@ -22,6 +22,10 @@ type Boolean struct {
 
 func NewBoolean(ctx *Context, s *schema.Schema) *Boolean {
 	vs := []validations.Validation{}
+	if v, err := validations.NewStringEnumValidation(s); err == nil {
+		ctx.AddValidation(v)
+		vs = append(vs, v)
+	}
 
 	var pr bool
 	if s.Extras["private"] != nil {

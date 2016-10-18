@@ -10,7 +10,7 @@ import (
 
 type String struct {
 	*schema.Schema
-	NativeType  string `json:"-"`
+	NativeType  string
 	ColumnName  string
 	ColumnType  string
 	Type        string
@@ -22,15 +22,19 @@ type String struct {
 
 func NewString(ctx *Context, s *schema.Schema) *String {
 	vs := []validations.Validation{}
+	if v, err := validations.NewStringEnumValidation(s); err == nil {
+		ctx.AddValidation(v)
+		vs = append(vs, v)
+	}
 	if v, err := validations.NewFormatValidation(s); err == nil {
 		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
-	if v, err := validations.NewMinLengthValidation(s); err == nil {
+	if v, err := validations.NewMaxLengthValidation(s); err == nil {
 		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
-	if v, err := validations.NewMaxLengthValidation(s); err == nil {
+	if v, err := validations.NewMinLengthValidation(s); err == nil {
 		ctx.AddValidation(v)
 		vs = append(vs, v)
 	}
@@ -66,17 +70,18 @@ func NewString(ctx *Context, s *schema.Schema) *String {
 	}
 }
 
-func (o String) MarshalJSON() ([]byte, error) {
+func (s String) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"Title":       o.Title(),
-		"Description": o.Description,
-		"Type":        o.Type,
-		"Name":        o.Name,
-		"Required":    o.Required,
-		"Validations": o.Validations,
-		"Properties":  o.Properties,
-		"ColumnName":  o.ColumnName,
-		"ColumnType":  o.ColumnType,
+		"Title":       s.Title(),
+		"Description": s.Description,
+		"NativeType":  s.NativeType,
+		"Type":        s.Type,
+		"Name":        s.Name,
+		"Required":    s.Required,
+		"Validations": s.Validations,
+		"Properties":  s.Properties,
+		"ColumnName":  s.ColumnName,
+		"ColumnType":  s.ColumnType,
 	})
 }
 

@@ -25,6 +25,16 @@ type Array struct {
 }
 
 func NewArray(ctx *Context, s *schema.Schema) *Array {
+	vs := []validations.Validation{}
+	if v, err := validations.NewMaxItemsValidation(s); err == nil {
+		ctx.AddValidation(v)
+		vs = append(vs, v)
+	}
+	if v, err := validations.NewMinItemsValidation(s); err == nil {
+		ctx.AddValidation(v)
+		vs = append(vs, v)
+	}
+
 	var pr bool
 	if s.Extras["private"] != nil {
 		pr, _ = helpers.GetPrivate(s)
@@ -40,15 +50,16 @@ func NewArray(ctx *Context, s *schema.Schema) *Array {
 	}
 
 	return &Array{
-		Schema:     s,
-		NativeType: "array",
-		ColumnName: cn,
-		ColumnType: ct,
-		Reference:  ctx.Raw.Reference,
-		Type:       helpers.UpperCamelCase(s.Title),
-		Name:       helpers.UpperCamelCase(s.Title),
-		key:        ctx.Key,
-		Private:    pr,
+		Schema:      s,
+		NativeType:  "array",
+		ColumnName:  cn,
+		ColumnType:  ct,
+		Reference:   ctx.Raw.Reference,
+		Type:        helpers.UpperCamelCase(s.Title),
+		Name:        helpers.UpperCamelCase(s.Title),
+		key:         ctx.Key,
+		Private:     pr,
+		Validations: vs,
 		Items: &ItemSpec{
 			ItemSpec: s.Items,
 			Schemas:  make([]Schema, len(s.Items.Schemas)),
