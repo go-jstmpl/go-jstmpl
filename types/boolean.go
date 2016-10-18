@@ -10,7 +10,7 @@ import (
 
 type Boolean struct {
 	*schema.Schema
-	NativeType  string `json:"-"`
+	NativeType  string
 	ColumnName  string
 	ColumnType  string
 	Type        string
@@ -57,6 +57,7 @@ func (o Boolean) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"Title":       o.Title(),
 		"Description": o.Description,
+		"NativeType":  o.NativeType,
 		"Type":        o.Type,
 		"Name":        o.Name,
 		"Required":    o.Required,

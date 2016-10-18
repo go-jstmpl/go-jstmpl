@@ -7,8 +7,8 @@ import (
 )
 
 type Undefined struct {
-	Schema      *schema.Schema `json:"-"`
-	NativeType  string         `json:"-"`
+	Schema      *schema.Schema
+	NativeType  string
 	ColumnName  string
 	ColumnType  string
 	Type        string
