@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-jstmpl/go-jstmpl/helpers"
 	"github.com/go-jstmpl/go-jstmpl/types"
+	"github.com/pkg/errors"
 )
 
 type Generator struct{}
@@ -17,11 +18,17 @@ func NewGenerator() *Generator {
 }
 
 type FormatError struct {
-	message string
+	err error
+}
+
+func NewFormatError(e error) FormatError {
+	return FormatError{
+		err: errors.Wrap(e, "fail to format Go"),
+	}
 }
 
 func (err FormatError) Error() string {
-	return err.message
+	return err.err.Error()
 }
 
 func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte, error) {
@@ -32,6 +39,8 @@ func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte,
 		"joinTypes":              helpers.JoinTypes,
 		"serialize":              helpers.Serialize,
 		"toStringLiteral":        helpers.ToStringLiteral,
+		"toPathLikeGorilla":      helpers.CatchErrorForString(helpers.ToPathLikeGorilla),
+		"toPathLikeSinatra":      helpers.CatchErrorForString(helpers.ToPathLikeSinatra),
 		"toLiteralForGo":         helpers.ToLiteralForGo,
 		"convertTypeForGo":       helpers.ConvertTypeForGo,
 		"convertTypeInJSONForGo": helpers.ConvertTypeInJSONForGo,
@@ -40,16 +49,17 @@ func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte,
 		"convertArrayForGo":      helpers.ConvertArrayForGo,
 		"toLiteralForJS":         helpers.ToLiteralForJS,
 		"convertTypeForJS":       helpers.ConvertTypeForJS,
-		"linkTitle":              helpers.LinkTitle,
 		"getKeyFromJSONPath":     helpers.GetKeyFromJSONPath,
 		"snakeCase":              helpers.SnakeCase,
 		"lowerSnakeCase":         helpers.LowerSnakeCase,
 		"upperSnakeCase":         helpers.UpperSnakeCase,
 		"lowerCamelCase":         helpers.LowerCamelCase,
 		"upperCamelCase":         helpers.UpperCamelCase,
+		// Deprecated: use printf
+		"linkTitle": helpers.LinkTitle,
 	}).Parse(string(tmpl)))
 	if err := t.Execute(out, model); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "fail to parse template")
 	}
 
 	// Format for each language
@@ -59,7 +69,7 @@ func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte,
 		var err error
 		formatted, err := format.Source(b)
 		if err != nil {
-			return b, FormatError{err.Error()}
+			return b, NewFormatError(err)
 		}
 		b = formatted
 	}
