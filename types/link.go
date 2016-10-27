@@ -66,7 +66,6 @@ type Link struct {
 	hschema.Link
 	Description   string
 	URL           *url.URL
-	RouterHref    string
 	Title         string
 	Method        string
 	UrlParameters []Schema
@@ -103,7 +102,6 @@ func (o Link) MarshalJSON() ([]byte, error) {
 		"TargetSchema": o.TargetSchema,
 		"Method":       o.Method,
 		"UrlParameter": o.UrlParameters,
-		"RouterHref":   o.RouterHref,
 	})
 }
 

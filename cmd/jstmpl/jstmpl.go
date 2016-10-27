@@ -13,6 +13,7 @@ import (
 	"github.com/go-jstmpl/go-jstmpl"
 	"github.com/jessevdk/go-flags"
 	"github.com/lestrrat/go-jshschema"
+	"github.com/pkg/errors"
 )
 
 func main() {
@@ -92,65 +93,70 @@ func _main() int {
 	}
 
 	err = filepath.Walk(opts.Template, func(i string, info os.FileInfo, err error) error {
-		if info == nil {
-			return fmt.Errorf("fail to find a template file or dir: %s", i)
-		}
-		if info.IsDir() {
-			return nil
-		}
-		r, err := filepath.Rel(opts.Template, i)
-		if err != nil {
-			return err
-		}
-		o := filepath.Join(opts.OutDir, r)
-		ext := filepath.Ext(o)
-		if ext == ".tmpl" {
-			o = strings.TrimRight(o, ext)
-		}
-
-		var tmpl []byte
-		if i != "" {
-			f, err := os.Open(i)
+		if err := (func() error {
+			if info == nil {
+				return fmt.Errorf("fail to find a template file or dir: %s", i)
+			}
+			if info.IsDir() {
+				return nil
+			}
+			r, err := filepath.Rel(opts.Template, i)
 			if err != nil {
 				return err
 			}
-			defer f.Close()
-			tmpl, err = ioutil.ReadAll(f)
-			if err != nil {
-				return err
+			o := filepath.Join(opts.OutDir, r)
+			ext := filepath.Ext(o)
+			if ext == ".tmpl" {
+				o = strings.TrimRight(o, ext)
 			}
-		}
 
-		g := jstmpl.NewGenerator()
-		b, gpErr := g.Process(ts, tmpl, filepath.Ext(o))
-		if gpErr != nil {
-			if _, ok := gpErr.(jstmpl.FormatError); !ok {
-				return gpErr
-			}
-		}
-
-		if o != "" {
-			d := filepath.Dir(o)
-			_, err := os.Stat(d)
-			if err != nil {
-				err := os.MkdirAll(d, 0755)
+			var tmpl []byte
+			if i != "" {
+				f, err := os.Open(i)
+				if err != nil {
+					return err
+				}
+				defer f.Close()
+				tmpl, err = ioutil.ReadAll(f)
 				if err != nil {
 					return err
 				}
 			}
-			if err := ioutil.WriteFile(o, b, 0644); err != nil {
-				return err
+
+			g := jstmpl.NewGenerator()
+			b, gpErr := g.Process(ts, tmpl, filepath.Ext(o))
+			if gpErr != nil {
+				if _, ok := gpErr.(jstmpl.FormatError); !ok {
+					return gpErr
+				}
 			}
-		}
 
-		if gpErr != nil {
-			return gpErr
-		}
+			if o != "" {
+				d := filepath.Dir(o)
+				_, err := os.Stat(d)
+				if err != nil {
+					err := os.MkdirAll(d, 0755)
+					if err != nil {
+						return err
+					}
+				}
+				if err := ioutil.WriteFile(o, b, 0644); err != nil {
+					return err
+				}
+			}
 
+			if gpErr != nil {
+				return gpErr
+			}
+
+			return nil
+		})(); err != nil {
+			return errors.Wrapf(err, "in '%s'", i)
+		}
 		return nil
 	})
 	if err != nil {
-		log.Printf("fail to generate: %s", err)
+		log.Println(errors.Wrap(err, "fail to generate"))
 		return 1
 	}
 
