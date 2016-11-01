@@ -21,6 +21,7 @@ func (err UncaughtCharacterError) Error() string {
 }
 
 type Token interface {
+	String() string
 	Gorilla() string
 	Sinatra() string
 }
@@ -33,6 +34,14 @@ func NewChunk(s string) *Chunk {
 
 func (c *Chunk) Append(b byte) {
 	*c += Chunk(b)
+}
+
+func (c Chunk) IsRef() bool {
+	return false
+}
+
+func (c Chunk) String() string {
+	return string(c)
 }
 
 func (c Chunk) Gorilla() string {
@@ -52,6 +61,14 @@ func NewRef(s string) *Ref {
 
 func (r *Ref) Append(b byte) {
 	*r += Ref(b)
+}
+
+func (r Ref) IsRef() bool {
+	return true
+}
+
+func (r Ref) String() string {
+	return ParseParam(string(r))
 }
 
 func (r Ref) Gorilla() string {

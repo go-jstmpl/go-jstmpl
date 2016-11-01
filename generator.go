@@ -35,10 +35,13 @@ func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte,
 	out := bytes.NewBuffer([]byte{})
 	t := template.Must(template.New("").Funcs(map[string]interface{}{
 		"getEnv":                 os.Getenv,
+		"add":                    helpers.Add,
+		"sub":                    helpers.Sub,
 		"notLast":                helpers.NotLast,
 		"joinTypes":              helpers.JoinTypes,
 		"serialize":              helpers.Serialize,
 		"toStringLiteral":        helpers.ToStringLiteral,
+		"buildURLToken":          helpers.BuildURLToken,
 		"toPathLikeGorilla":      helpers.CatchErrorForString(helpers.ToPathLikeGorilla),
 		"toPathLikeSinatra":      helpers.CatchErrorForString(helpers.ToPathLikeSinatra),
 		"toLiteralForGo":         helpers.ToLiteralForGo,
