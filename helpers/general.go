@@ -50,3 +50,16 @@ func ToStringLiteral(v interface{}) string {
 	}
 	return fmt.Sprint(v)
 }
+
+func Slice(s ...interface{}) []interface{} {
+	return s
+}
+
+func In(e interface{}, s []interface{}) bool {
+	for _, v := range s {
+		if v == e {
+			return true
+		}
+	}
+	return false
+}
