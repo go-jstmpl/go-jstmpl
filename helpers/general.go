@@ -3,6 +3,7 @@ package helpers
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -55,11 +56,18 @@ func Slice(s ...interface{}) []interface{} {
 	return s
 }
 
-func In(e interface{}, s []interface{}) bool {
-	for _, v := range s {
-		if v == e {
-			return true
+func In(e interface{}, s interface{}) bool {
+	switch reflect.TypeOf(s).Kind() {
+	case reflect.Slice:
+		t := reflect.ValueOf(s)
+		for i := 0; i < t.Len(); i++ {
+			v := t.Index(i)
+			if v.Interface() == e {
+				return true
+			}
 		}
+		return false
+	default:
+		return false
 	}
-	return false
 }
