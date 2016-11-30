@@ -9,12 +9,8 @@ import (
 
 func ToLiteralForJS(input interface{}) string {
 	switch t := input.(type) {
-	case bool:
-		return fmt.Sprintf("%b", t)
-	case int, int8, int16, int32, int64:
-		return fmt.Sprintf("%d", t)
-	case float32, float64:
-		return fmt.Sprintf("%f", t)
+	case bool, int, int8, int16, int32, int64, float32, float64:
+		return fmt.Sprintf("%v", t)
 	case string:
 		return fmt.Sprintf("\"%s\"", t)
 	}
