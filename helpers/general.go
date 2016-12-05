@@ -56,10 +56,21 @@ func Slice(s ...interface{}) []interface{} {
 	return s
 }
 
-func In(e interface{}, s interface{}) bool {
+func InSlice(e, s interface{}, condition func(interface{}, reflect.Value) bool) bool {
 	switch reflect.TypeOf(s).Kind() {
 	case reflect.Slice:
 		t := reflect.ValueOf(s)
+		if condition(e, t) {
+			return true
+		}
+		return false
+	default:
+		return false
+	}
+}
+
+func In(e interface{}, s interface{}) bool {
+	cond := func(e interface{}, t reflect.Value) bool {
 		for i := 0; i < t.Len(); i++ {
 			v := t.Index(i)
 			if v.Interface() == e {
@@ -67,7 +78,25 @@ func In(e interface{}, s interface{}) bool {
 			}
 		}
 		return false
-	default:
+	}
+	return InSlice(e, s, cond)
+}
+
+func InMapKeys(e interface{}, s interface{}) bool {
+	cond := func(e interface{}, t reflect.Value) bool {
+		for i := 0; i < t.Len(); i++ {
+			v := t.Index(i)
+			m, ok := v.Interface().(map[string]interface{})
+			if !ok {
+				continue
+			}
+			for k := range m {
+				if k == e {
+					return true
+				}
+			}
+		}
 		return false
 	}
+	return InSlice(e, s, cond)
 }
