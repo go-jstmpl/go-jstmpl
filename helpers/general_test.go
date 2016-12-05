@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/go-jstmpl/go-jstmpl/helpers"
+	"github.com/go-jstmpl/go-jstmpl/validations"
 )
 
 func TestToStringLiteral(t *testing.T) {
@@ -225,6 +226,18 @@ func TestInMapKeys(t *testing.T) {
 			expected: true,
 		},
 		{
+			description: "existed string in map of keys",
+			input: Input{
+				element: "foo",
+				slice: []interface{}{
+					map[string][]interface{}{
+						"foo": []interface{}{1, 2, 3},
+					},
+				},
+			},
+			expected: true,
+		},
+		{
 			description: "existed string in 2nd map of keys",
 			input: Input{
 				element: "foo",
@@ -241,20 +254,34 @@ func TestInMapKeys(t *testing.T) {
 			expected: true,
 		},
 		{
-			description: "invalid type of slice element",
+			description: "existed string in validations name",
 			input: Input{
-				element: "foo",
+				element: "Enum",
 				slice: []interface{}{
-					map[interface{}]interface{}{
-						"foo": 1,
-						"bar": 5,
+					validations.StringEnumValidation{
+						Enum: []string{"foo", "bar"},
 					},
 				},
 			},
-			expected: false,
+			expected: true,
 		},
 		{
-			description: "non-existed string in strings",
+			description: "existed string in 2nd validations name",
+			input: Input{
+				element: "Enum",
+				slice: []interface{}{
+					validations.MaxLengthValidation{
+						MaxLength: 4,
+					},
+					validations.StringEnumValidation{
+						Enum: []string{"foo", "bar"},
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			description: "slice not exist",
 			input: Input{
 				element: "qux",
 			},
