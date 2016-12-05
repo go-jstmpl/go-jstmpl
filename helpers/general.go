@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/go-jstmpl/go-jstmpl/validations"
 	schema "github.com/lestrrat/go-jsschema"
 )
 
@@ -85,15 +86,28 @@ func In(e interface{}, s interface{}) bool {
 func InMapKeys(e interface{}, s interface{}) bool {
 	cond := func(e interface{}, t reflect.Value) bool {
 		for i := 0; i < t.Len(); i++ {
-			v := t.Index(i)
-			m, ok := v.Interface().(map[string]interface{})
-			if !ok {
-				continue
-			}
-			for k := range m {
-				if k == e {
-					return true
+			v := t.Index(i).Interface()
+			switch m := v.(type) {
+			case map[string]interface{}:
+				for k := range m {
+					if k == e {
+						return true
+					}
 				}
+			case map[string][]interface{}:
+				for k := range m {
+					if k == e {
+						return true
+					}
+				}
+			case validations.Validation:
+				for k := range m.Args() {
+					if k == e {
+						return true
+					}
+				}
+			default:
+				return false
 			}
 		}
 		return false
