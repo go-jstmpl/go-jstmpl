@@ -198,3 +198,74 @@ func TestIn(t *testing.T) {
 		}
 	}
 }
+
+func TestInMapKeys(t *testing.T) {
+	type Input struct {
+		element interface{}
+		slice   []interface{}
+	}
+	type Case struct {
+		description string
+		input       Input
+		expected    bool
+	}
+
+	cases := []Case{
+		{
+			description: "existed string in keys",
+			input: Input{
+				element: "foo",
+				slice: []interface{}{
+					map[string]interface{}{
+						"foo": 1,
+						"bar": 5,
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			description: "existed string in 2nd map of keys",
+			input: Input{
+				element: "foo",
+				slice: []interface{}{
+					map[string]interface{}{
+						"ok": "ok",
+					},
+					map[string]interface{}{
+						"foo": 1,
+						"bar": 5,
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			description: "invalid type of slice element",
+			input: Input{
+				element: "foo",
+				slice: []interface{}{
+					map[interface{}]interface{}{
+						"foo": 1,
+						"bar": 5,
+					},
+				},
+			},
+			expected: false,
+		},
+		{
+			description: "non-existed string in strings",
+			input: Input{
+				element: "qux",
+			},
+			expected: false,
+		},
+	}
+
+	for _, c := range cases {
+		actual := helpers.InMapKeys(c.input.element, c.input.slice)
+		if actual != c.expected {
+			t.Errorf("Test with %s: expected %t, but actual %t", c.description, c.expected, actual)
+		}
+	}
+}
