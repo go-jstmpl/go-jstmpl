@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"go/format"
 	"os"
+	"strings"
 	"text/template"
 
 	"github.com/go-jstmpl/go-jstmpl/helpers"
@@ -61,6 +62,21 @@ func (g *Generator) Process(model *types.Root, tmpl []byte, ext string) ([]byte,
 		"upperSnakeCase":         helpers.UpperSnakeCase,
 		"lowerCamelCase":         helpers.LowerCamelCase,
 		"upperCamelCase":         helpers.UpperCamelCase,
+		"replace":                strings.Replace,
+		"title":                  strings.Title,
+		"toLower":                strings.ToLower,
+		"toLowerSpecial":         strings.ToLowerSpecial,
+		"toTitle":                strings.ToTitle,
+		"toTitleSpecial":         strings.ToTitleSpecial,
+		"toUpper":                strings.ToUpper,
+		"toUpperSpecial":         strings.ToUpperSpecial,
+		"trim":                   strings.Trim,
+		"trimFunc":               strings.TrimFunc,
+		"trimLeft":               strings.TrimLeft,
+		"trimPrefix":             strings.TrimPrefix,
+		"trimRight":              strings.TrimRight,
+		"trimSpace":              strings.TrimSpace,
+		"trimSuffix":             strings.TrimSuffix,
 		// Deprecated: use printf
 		"linkTitle": helpers.LinkTitle,
 	}).Parse(string(tmpl)))
