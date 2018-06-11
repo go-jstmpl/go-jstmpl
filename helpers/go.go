@@ -12,7 +12,7 @@ import (
 func ToLiteralForGo(input interface{}) string {
 	switch t := input.(type) {
 	case bool:
-		return fmt.Sprintf("%b", t)
+		return fmt.Sprintf("%t", t)
 	case int, int8, int16, int32, int64:
 		return fmt.Sprintf("%d", t)
 	case float32, float64:
